@@ -1,27 +1,28 @@
 /* 页面整体 */
 page {
-  background: #f5f5f5;
+  background: #ffffff;
   height: 100%;
   overflow: hidden;
 }
 
-/* ========== 固定区域：个人资料 + 统计 ========== */
+/* ========== 固定区域 ========== */
 .fixed-top {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: #f5f5f5;
   z-index: 100;
 }
 
-/* 导航栏（在固定区域内，与首页、消息页一致） */
+/* 导航栏 */
 .nav-content {
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-bottom: 1rpx solid #e0e0e0;
+  background: #ffffff;
 }
 
 .nav-title {
@@ -30,43 +31,172 @@ page {
   color: #000;
 }
 
-/* ========== 未登录：引导登录 ========== */
-.login-prompt {
-  padding: 40px 16px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1rpx solid #e0e0e0;
+/* ========== 未登录：会员卡风格 ========== */
+.member-card {
+  margin: 16px;
+  padding: 28px 20px 20px;
+  background: linear-gradient(135deg, #3a3f51 0%, #2d3142 100%);
+  border-radius: 16px;
+  position: relative;
 }
 
-.default-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: #999;
-}
-
-.login-btn {
-  margin-top: 8px;
-  padding: 8px 32px;
-  background: #07C160;
-  color: white;
-  font-size: 15px;
+.member-card-tag {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 2px 10px;
   border-radius: 20px;
 }
 
-.login-hint {
-  font-size: 12px;
-  color: #999;
+.member-card-body {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding-top: 8px;
 }
 
-/* ========== 已登录：个人资料（和你提供的HTML布局一致） ========== */
+.member-card-body .avatar-btn {
+  width: 50%;
+}
+
+.member-card-body .member-card-right {
+  width: 50%;
+}
+
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.avatar-btn::after {
+  border: none;
+}
+
+.default-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: block;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.member-card-center {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-card-right {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nickname-row {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 8px 14px;
+}
+
+.nickname-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.nickname-input {
+  flex: 1;
+  font-size: 14px;
+  color: #fff;
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.nickname-input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.login-btn {
+  background: #07C160;
+  color: white;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ========== 四个数据卡片（关注/收藏/点赞/咨询） ========== */
+.info-cards {
+  margin: 0 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.info-card {
+  width: calc(50% - 5px);
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.info-card-left {
+  flex: 1;
+}
+
+.info-card-label {
+  font-size: 13px;
+  color: #333;
+  display: block;
+}
+
+.info-card-num {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.info-card-en {
+  font-size: 10px;
+  color: #bbb;
+  letter-spacing: 1px;
+  display: block;
+  margin-top: 2px;
+}
+
+.info-card-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.info-icon-blue { }
+.info-icon-orange { }
+.info-icon-red { }
+.info-icon-purple { }
+
+/* ========== 已登录：个人资料 ========== */
 .profile-inner {
   padding: 20px 16px 16px;
   border-bottom: 1rpx solid #f0f0f0;
@@ -101,6 +231,19 @@ page {
   font-size: 12px;
   color: #999;
   display: block;
+}
+
+.profile-settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.settings-icon {
+  font-size: 20px;
 }
 
 .profile-log {
@@ -166,18 +309,61 @@ page {
   color: #999;
 }
 
-/* ========== 可滚动区域：菜单列表 ========== */
-.menu-scroll {
+/* ========== 未登录：9分类导航网格 ========== */
+.guest-grid {
   background: white;
+  margin: 10px 16px;
+  border-radius: 12px;
+  padding: 20px 8px 8px;
+}
+
+.guest-grid-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.guest-grid-item {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.guest-grid-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.guest-grid-icon {
+  font-size: 22px;
+}
+
+.guest-grid-name {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+}
+
+/* ========== 可滚动区域 ========== */
+.menu-scroll {
+  background: #f5f5f5;
 }
 
 .menu-section {
   background: white;
+  margin: 10px 16px;
+  border-radius: 12px;
 }
 
 .menu-section-gap {
-  height: 1rpx;
-  background: #e0e0e0;
+  height: 0;
 }
 
 .menu-list {
@@ -243,7 +429,14 @@ page {
   padding: 0 5px;
 }
 
-/* 底部安全距离 */
 .safe-bottom {
   height: 20px;
+}
+
+.switch-role-btn {
+  background: #F0FFF4;
+}
+
+.switch-role-btn:active {
+  background: #E8F5E9;
 }

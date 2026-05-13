@@ -1,5 +1,11 @@
 <!--service-detail.wxml-->
 <view class="page">
+  <!-- 加载中提示 -->
+  <view class="loading-cover" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
   <!-- 导航栏（绝对定位，覆盖在图片上） -->
   <view class="nav-bar">
     <view class="nav-content">

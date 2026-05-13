@@ -1,22 +1,21 @@
 /**
- * 登录工具函数（兼容微信新版本 SDK）
- *
- * 新版微信不再支持 wx.getUserProfile，
- * 改用 wx.login 静默登录 + 本地标记登录态。
- *
- * 用法：
- *   const login = require('../../utils/login.js');
- *   login.checkLogin()  — 同步检查是否已登录
- *   login.requireLogin() — 未登录则弹窗提示，返回 Promise
- *   login.getUserInfo() — 获取已存储的用户信息
+ * 登录工具函数
+ * 对接云函数实现用户登录注册
  */
+
+const CLOUD_FUNCTION = {
+  login: 'login',
+  getUserInfo: 'getUserInfo',
+  merchantApply: 'merchantApply',
+  becomeMerchant: 'becomeMerchant'
+};
 
 // 检查是否已登录（同步）
 function checkLogin() {
   return !!wx.getStorageSync('isLoggedIn');
 }
 
-// 未登录时弹出登录提示，用户确认后执行登录
+// 未登录时弹出登录提示，用户确认后跳转到个人页面
 function requireLogin() {
   return new Promise((resolve, reject) => {
     if (checkLogin()) {
@@ -29,7 +28,10 @@ function requireLogin() {
       confirmText: '去登录',
       success(res) {
         if (res.confirm) {
-          doLogin().then(resolve).catch(reject);
+          // 跳转到个人页面进行登录
+          wx.switchTab({
+            url: '/pages/profile/profile'
+          });
         } else {
           reject('用户取消登录');
         }
@@ -38,25 +40,42 @@ function requireLogin() {
   });
 }
 
-// 执行登录（仅 wx.login，不获取用户头像昵称）
+// 执行登录 - 获取微信登录凭证 + 调用云函数（基础版，不获取用户信息）
 function doLogin() {
   return new Promise((resolve, reject) => {
     wx.login({
       success(loginRes) {
-        if (loginRes.code) {
-          var existing = wx.getStorageSync('userInfo') || {};
-          var userInfo = Object.assign({}, existing, {
-            nickName: existing.nickName || '微信用户',
-            avatarUrl: existing.avatarUrl || '',
-            loginCode: loginRes.code,
-            loginTime: Date.now()
-          });
-          wx.setStorageSync('userInfo', userInfo);
-          wx.setStorageSync('isLoggedIn', true);
-          resolve(userInfo);
-        } else {
+        if (!loginRes.code) {
           reject('登录失败：未获取到 code');
+          return;
         }
+        wx.cloud.callFunction({
+          name: CLOUD_FUNCTION.login,
+          data: { loginCode: loginRes.code },
+          success: (res) => {
+            if (res.result && res.result.success) {
+              const userData = res.result.data;
+              const userInfo = {
+                userId: userData.userId,
+                nickname: userData.nickname,
+                avatar: userData.avatar,
+                isMerchant: userData.isMerchant,
+                merchantStatus: userData.merchantStatus,
+                isNewUser: userData.isNewUser,
+                loginTime: Date.now()
+              };
+              wx.setStorageSync('userInfo', userInfo);
+              wx.setStorageSync('isLoggedIn', true);
+              resolve(userInfo);
+            } else {
+              reject(res.result.errMsg || '登录失败');
+            }
+          },
+          fail: (err) => {
+            console.error('登录云函数调用失败', err);
+            reject('网络错误，请稍后再试');
+          }
+        });
       },
       fail() {
         reject('网络错误，请稍后再试');
@@ -65,21 +84,187 @@ function doLogin() {
   });
 }
 
-// 获取已存储的用户信息
+// 带用户信息的登录（头像+昵称）
+function doLoginWithInfo(nickname, avatar) {
+  return new Promise((resolve, reject) => {
+    wx.login({
+      success(loginRes) {
+        if (!loginRes.code) {
+          reject('登录失败：未获取到 code');
+          return;
+        }
+        wx.cloud.callFunction({
+          name: CLOUD_FUNCTION.login,
+          data: {
+            loginCode: loginRes.code,
+            nickname: nickname,
+            avatar: avatar
+          },
+          success: (res) => {
+            if (res.result && res.result.success) {
+              const userData = res.result.data;
+              const userInfo = {
+                userId: userData.userId,
+                nickname: userData.nickname || nickname,
+                avatar: userData.avatar || avatar,
+                isMerchant: userData.isMerchant,
+                merchantStatus: userData.merchantStatus,
+                isNewUser: userData.isNewUser,
+                loginTime: Date.now()
+              };
+              wx.setStorageSync('userInfo', userInfo);
+              wx.setStorageSync('isLoggedIn', true);
+              resolve(userInfo);
+            } else {
+              reject(res.result.errMsg || '登录失败');
+            }
+          },
+          fail: (err) => {
+            console.error('登录云函数调用失败', err);
+            reject('网络错误，请稍后再试');
+          }
+        });
+      },
+      fail() {
+        reject('网络错误，请稍后再试');
+      }
+    });
+  });
+}
+
+// 获取用户信息
 function getUserInfo() {
   return wx.getStorageSync('userInfo') || null;
+}
+
+// 获取完整的用户信息（从云函数）
+function fetchUserInfo() {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name: CLOUD_FUNCTION.getUserInfo,
+      success: (res) => {
+        if (res.result && res.result.success) {
+          const userData = res.result.data;
+          const userInfo = {
+            userId: userData.userId,
+            nickname: userData.nickname,
+            avatar: userData.avatar,
+            isMerchant: userData.isMerchant,
+            merchantStatus: userData.merchantStatus,
+            loginTime: Date.now()
+          };
+          wx.setStorageSync('userInfo', userInfo);
+          resolve(userInfo);
+        } else {
+          reject(res.result.errMsg || '获取用户信息失败');
+        }
+      },
+      fail: (err) => {
+        reject(err.message || '网络错误');
+      }
+    });
+  });
+}
+
+// 获取商家状态
+function getMerchantStatus() {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name: CLOUD_FUNCTION.becomeMerchant,
+      success: (res) => {
+        if (res.result && res.result.success) {
+          resolve(res.result.data);
+        } else {
+          reject(res.result.errMsg || '获取商家状态失败');
+        }
+      },
+      fail: (err) => {
+        reject(err.message || '网络错误');
+      }
+    });
+  });
+}
+
+// 申请成为商家
+function applyMerchant(data) {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name: CLOUD_FUNCTION.merchantApply,
+      data: data,
+      success: (res) => {
+        if (res.result && res.result.success) {
+          // 更新本地存储的商家状态
+          const userInfo = getUserInfo();
+          if (userInfo) {
+            userInfo.merchantStatus = 'pending';
+            wx.setStorageSync('userInfo', userInfo);
+          }
+          resolve(res.result.data);
+        } else {
+          reject(res.result.errMsg || '申请失败');
+        }
+      },
+      fail: (err) => {
+        reject(err.message || '网络错误');
+      }
+    });
+  });
 }
 
 // 退出登录
 function logout() {
   wx.removeStorageSync('isLoggedIn');
   wx.removeStorageSync('userInfo');
+  wx.removeStorageSync('currentRole');
+}
+
+// 获取当前角色（user 或 merchant）
+function getCurrentRole() {
+  return wx.getStorageSync('currentRole') || 'user';
+}
+
+// 设置当前角色
+function setCurrentRole(role) {
+  wx.setStorageSync('currentRole', role);
+}
+
+// 切换角色
+function switchRole() {
+  const current = getCurrentRole();
+  const userInfo = getUserInfo();
+  if (!userInfo || !userInfo.isMerchant) return Promise.reject('不是商家，无法切换');
+  const newRole = current === 'user' ? 'merchant' : 'user';
+  setCurrentRole(newRole);
+  return Promise.resolve(newRole);
+}
+
+// 获取切换后的角色文本
+function getSwitchRoleText() {
+  const userInfo = getUserInfo();
+  if (!userInfo || !userInfo.isMerchant) return '';
+  const current = getCurrentRole();
+  return current === 'user' ? '切换商家' : '切换用户';
+}
+
+// 判断用户是否是已审核通过的商家（同步）
+function getIsMerchantApproved() {
+  const userInfo = getUserInfo();
+  return !!(userInfo && userInfo.isMerchant && userInfo.merchantStatus === 'approved');
 }
 
 module.exports = {
   checkLogin,
   requireLogin,
   doLogin,
+  doLoginWithInfo,
   getUserInfo,
-  logout
+  fetchUserInfo,
+  getMerchantStatus,
+  applyMerchant,
+  logout,
+  getCurrentRole,
+  setCurrentRole,
+  switchRole,
+  getSwitchRoleText,
+  getIsMerchantApproved
 };

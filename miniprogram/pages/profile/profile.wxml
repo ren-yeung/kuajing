@@ -1,25 +1,45 @@
 <!-- 固定区域：个人资料 + 统计 -->
-<view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
+<view class="fixed-top" style="padding-top: {{statusBarHeight}}px; background: {{isLoggedIn ? '#ffffff' : '#f5f5f5'}};">
   <!-- 导航栏（在固定区域内） -->
   <view class="nav-content">
     <text class="nav-title">个人主页</text>
   </view>
 
-  <!-- 未登录：引导登录 -->
-  <view class="login-prompt" wx:if="{{!isLoggedIn}}">
-    <view class="default-avatar">👤</view>
-    <view class="login-btn" bindtap="onLogin">点击登录</view>
-    <text class="login-hint">登录后查看更多功能</text>
+  <!-- 未登录：会员卡风格引导登录（参考图） -->
+  <view class="member-card" wx:if="{{!isLoggedIn}}">
+    <!-- 主体：头像在左，昵称+登录垂直排列在右 -->
+    <view class="member-card-body">
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image class="default-avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+      </button>
+      <view class="member-card-right">
+        <view class="nickname-row">
+          <text class="nickname-label">昵称</text>
+          <input 
+            class="nickname-input" 
+            type="nickname" 
+            placeholder="点击设置昵称" 
+            value="{{nickname}}"
+            bindinput="onNicknameInput"
+            bindblur="onNicknameBlur"
+          />
+        </view>
+        <view class="login-btn" bindtap="onLogin">登录</view>
+      </view>
+    </view>
   </view>
 
-  <!-- 已登录：个人资料（和你提供的HTML布局一致） -->
+  <!-- 已登录：个人资料 -->
   <view wx:else>
     <view class="profile-inner">
       <view class="profile-header">
-        <image class="profile-avatar" src="{{userInfo.avatarUrl}}"></image>
+        <image class="profile-avatar" src="{{userInfo.avatar}}"></image>
         <view class="profile-info">
-          <text class="profile-name">{{userInfo.nickName}}</text>
+          <text class="profile-name">{{userInfo.nickname}}</text>
           <text class="profile-mood">{{mood}}</text>
+        </view>
+        <view class="profile-settings" bindtap="goPage" data-page="settings">
+          <text class="settings-icon">⚙️</text>
         </view>
       </view>
 
@@ -44,124 +64,181 @@
       </view>
     </view>
   </view>
+
+  <!-- 四个数据卡片（关注、收藏、点赞、咨询）- 仅未登录显示 -->
+  <view class="info-cards" wx:if="{{!isLoggedIn}}" style="margin-top: 8px;">
+    <view class="info-card" bindtap="onLogin">
+      <view class="info-card-left">
+        <text class="info-card-label">关注：<text class="info-card-num">0</text></text>
+        <text class="info-card-en">FOLLOW</text>
+      </view>
+      <text class="info-card-icon info-icon-blue">👁️</text>
+    </view>
+    <view class="info-card" bindtap="onLogin">
+      <view class="info-card-left">
+        <text class="info-card-label">收藏：<text class="info-card-num">0</text></text>
+        <text class="info-card-en">COLLECTION</text>
+      </view>
+      <text class="info-card-icon info-icon-orange">⭐</text>
+    </view>
+    <view class="info-card" bindtap="onLogin">
+      <view class="info-card-left">
+        <text class="info-card-label">点赞：<text class="info-card-num">0</text></text>
+        <text class="info-card-en">LIKE</text>
+      </view>
+      <text class="info-card-icon info-icon-red">❤️</text>
+    </view>
+    <view class="info-card" bindtap="onLogin">
+      <view class="info-card-left">
+        <text class="info-card-label">咨询：<text class="info-card-num">0</text></text>
+        <text class="info-card-en">CONSULT</text>
+      </view>
+      <text class="info-card-icon info-icon-purple">💬</text>
+    </view>
+  </view>
+
+  <!-- 未登录：9个分类导航网格（固定显示，随页面一起滚动） -->
+  <view class="guest-grid" wx:if="{{!isLoggedIn}}" style="margin: 12px 16px;">
+    <view class="guest-grid-list">
+      <view class="guest-grid-item"
+            wx:for="{{guestCategories}}"
+            wx:key="id"
+            bindtap="onGuestCategoryTap">
+        <view class="guest-grid-icon-wrap" style="background: {{item.bgColor}};">
+          <text class="guest-grid-icon">{{item.icon}}</text>
+        </view>
+        <text class="guest-grid-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
 </view>
 
-<!-- 占位：顶出固定区域高度 -->
-<view style="height: {{fixedTopHeight}}px;"></view>
-
-<!-- 可滚动区域：菜单列表 -->
+<!-- 可滚动区域 -->
 <scroll-view
   class="menu-scroll"
   scroll-y
   enhanced
   show-scrollbar="{{false}}"
-  style="height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px);"
+  style="position: fixed; top: {{fixedTopHeight}}px; height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px); width: 100%; background: {{isLoggedIn ? '#ffffff' : '#f5f5f5'}};"
 >
-  <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
-  <view class="menu-section">
-    <view class="menu-list">
-      <view class="menu-item" bindtap="goPage" data-page="myPosts">
-        <view class="menu-left">
-          <view class="menu-icon">📝</view>
-          <text class="menu-label">我的发布</text>
-          <text class="menu-count">{{stats.publish || 0}}篇</text>
+  <!-- 已登录：完整菜单列表 -->
+  <block wx:if="{{isLoggedIn}}">
+    <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
+    <view class="menu-section">
+      <view class="menu-list">
+        <view class="menu-item" bindtap="goPage" data-page="myPosts">
+          <view class="menu-left">
+            <view class="menu-icon">📝</view>
+            <text class="menu-label">我的发布</text>
+            <text class="menu-count">{{stats.publish || 0}}篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="myLikes">
-        <view class="menu-left">
-          <view class="menu-icon">❤️</view>
-          <text class="menu-label">我的点赞</text>
-          <text class="menu-count">28篇</text>
+        <view class="menu-item" bindtap="goPage" data-page="myLikes">
+          <view class="menu-left">
+            <view class="menu-icon">❤️</view>
+            <text class="menu-label">我的点赞</text>
+            <text class="menu-count">28篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="myFavorites">
-        <view class="menu-left">
-          <view class="menu-icon">⭐</view>
-          <text class="menu-label">我的收藏</text>
-          <text class="menu-count">15篇</text>
+        <view class="menu-item" bindtap="goPage" data-page="myFavorites">
+          <view class="menu-left">
+            <view class="menu-icon">⭐</view>
+            <text class="menu-label">我的收藏</text>
+            <text class="menu-count">15篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="history">
-        <view class="menu-left">
-          <view class="menu-icon">📱</view>
-          <text class="menu-label">浏览历史</text>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
-  </view>
-
-  <view class="menu-section-gap"></view>
-
-  <!-- 第二组：我的消息、系统通知 -->
-  <view class="menu-section">
-    <view class="menu-list">
-      <view class="menu-item" bindtap="goPage" data-page="myMessages">
-        <view class="menu-left">
-          <view class="menu-icon">💬</view>
-          <text class="menu-label">我的消息</text>
-        </view>
-        <view style="display: flex; align-items: center; gap: 8px;">
-          <view class="menu-badge" wx:if="{{unreadCount > 0}}">{{unreadCount}}</view>
+        <view class="menu-item" bindtap="goPage" data-page="history">
+          <view class="menu-left">
+            <view class="menu-icon">📱</view>
+            <text class="menu-label">浏览历史</text>
+          </view>
           <text class="menu-arrow">›</text>
         </view>
       </view>
-      <view class="menu-item" bindtap="goPage" data-page="notifications">
-        <view class="menu-left">
-          <view class="menu-icon">🔔</view>
-          <text class="menu-label">系统通知</text>
+    </view>
+
+    <view class="menu-section-gap"></view>
+
+    <!-- 第二组：我的消息、系统通知 -->
+    <view class="menu-section">
+      <view class="menu-list">
+        <view class="menu-item" bindtap="goPage" data-page="myMessages">
+          <view class="menu-left">
+            <view class="menu-icon">💬</view>
+            <text class="menu-label">我的消息</text>
+          </view>
+          <view style="display: flex; align-items: center; gap: 8px;">
+            <view class="menu-badge" wx:if="{{unreadCount > 0}}">{{unreadCount}}</view>
+            <text class="menu-arrow">›</text>
+          </view>
         </view>
-        <text class="menu-arrow">›</text>
+        <view class="menu-item" bindtap="goPage" data-page="notifications">
+          <view class="menu-left">
+            <view class="menu-icon">🔔</view>
+            <text class="menu-label">系统通知</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
     </view>
-  </view>
 
-  <view class="menu-section-gap"></view>
+    <view class="menu-section-gap"></view>
 
-  <!-- 第三组：编辑资料、隐私设置、帮助与反馈、成为商家 -->
-  <view class="menu-section">
-    <view class="menu-list">
-      <view class="menu-item" bindtap="goPage" data-page="editProfile">
-        <view class="menu-left">
-          <view class="menu-icon">👤</view>
-          <text class="menu-label">编辑资料</text>
+    <!-- 第三组：编辑资料、隐私设置、帮助与反馈、成为商家 -->
+    <view class="menu-section">
+      <view class="menu-list">
+        <view class="menu-item" bindtap="goPage" data-page="editProfile">
+          <view class="menu-left">
+            <view class="menu-icon">👤</view>
+            <text class="menu-label">编辑资料</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="privacy">
-        <view class="menu-left">
-          <view class="menu-icon">🔒</view>
-          <text class="menu-label">隐私设置</text>
+        <view class="menu-item" bindtap="goPage" data-page="privacy">
+          <view class="menu-left">
+            <view class="menu-icon">🔒</view>
+            <text class="menu-label">隐私设置</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="help">
-        <view class="menu-left">
-          <view class="menu-icon">❓</view>
-          <text class="menu-label">帮助与反馈</text>
+        <view class="menu-item" bindtap="goPage" data-page="help">
+          <view class="menu-left">
+            <view class="menu-icon">❓</view>
+            <text class="menu-label">帮助与反馈</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" bindtap="goPage" data-page="becomeMerchant">
-        <view class="menu-left">
-          <view class="menu-icon">🏪</view>
-          <text class="menu-label">成为商家</text>
+        <!-- 根据身份状态显示不同按钮 -->
+        <block wx:if="{{isLoggedIn}}">
+          <view class="menu-item" wx:if="{{!isMerchant}}" bindtap="goPage" data-page="becomeMerchant">
+            <view class="menu-left">
+              <view class="menu-icon" style="background: #FFF3E0;">🏪</view>
+              <text class="menu-label" style="color: #FF6B00;">成为商家</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+          <view class="menu-item switch-role-btn" wx:else bindtap="onSwitchRole">
+            <view class="menu-left">
+              <view class="menu-icon" style="background: #E8F5E9;">🔄</view>
+              <text class="menu-label" style="color: #07C160;">{{switchRoleText}}</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+        </block>
+        <!-- 已登录才显示退出登录 -->
+        <view class="menu-item" bindtap="onLogout">
+          <view class="menu-left">
+            <view class="menu-icon">🚪</view>
+            <text class="menu-label" style="color: #ff3b30;">退出登录</text>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <!-- 已登录才显示退出登录 -->
-      <view class="menu-item" wx:if="{{isLoggedIn}}" bindtap="onLogout">
-        <view class="menu-left">
-          <view class="menu-icon">🚪</view>
-          <text class="menu-label" style="color: #ff3b30;">退出登录</text>
-        </view>
-        <text class="menu-arrow">›</text>
       </view>
     </view>
-  </view>
+  </block>
 
   <!-- 底部安全距离 -->
   <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 8 : 8}}px;"></view>

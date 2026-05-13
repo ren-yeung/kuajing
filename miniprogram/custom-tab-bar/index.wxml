@@ -4,10 +4,7 @@
     bindtap="switchTab" 
     data-index="0"
   >
-    <image 
-      src="{{selected === 0 ? '/images/home-active.png' : '/images/home.png'}}" 
-      class="tab-icon"
-    ></image>
+    <text class="tab-icon-text">🏠</text>
     <text class="tab-label">首页</text>
   </view>
   
@@ -19,10 +16,7 @@
     <view class="notification-dot" wx:if="{{messageCount > 0}}">
       <view class="dot"></view>
     </view>
-    <image 
-      src="{{selected === 1 ? '/images/message-active.png' : '/images/message.png'}}" 
-      class="tab-icon"
-    ></image>
+    <text class="tab-icon-text">💬</text>
     <text class="tab-label">消息</text>
   </view>
   
@@ -31,10 +25,7 @@
     bindtap="switchTab" 
     data-index="2"
   >
-    <image 
-      src="{{selected === 2 ? '/images/profile-active.png' : '/images/profile.png'}}" 
-      class="tab-icon"
-    ></image>
+    <text class="tab-icon-text">👤</text>
     <text class="tab-label">我的</text>
   </view>
 </view>

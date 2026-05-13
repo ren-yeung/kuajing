@@ -1,10 +1,12 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/demand-square/demand-square",
     "pages/message/message",
     "pages/profile/profile",
     "pages/publish-need/publish-need",
-    "pages/service-detail/service-detail"
+    "pages/service-detail/service-detail",
+    "pages/merchant-apply/merchant-apply"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -1,0 +1,135 @@
+<view class="container">
+  <!-- 导航栏（固定定位） -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-back" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+        <text class="back-text">返回</text>
+      </view>
+      <text class="nav-title">商家入驻申请</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 占位：顶出导航栏高度 -->
+  <view style="height: {{navHeight}}px;"></view>
+
+  <!-- 表单区域 -->
+  <scroll-view 
+    class="form-scroll" 
+    scroll-y 
+    style="height: {{scrollViewHeight}}px;"
+  >
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <!-- 公司名称 -->
+      <view class="form-item">
+        <view class="form-label">公司名称 <text class="required">*</text></view>
+        <input 
+          class="form-input" 
+          placeholder="请输入公司名称"
+          value="{{form.companyName}}"
+          data-field="companyName"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 联系人 -->
+      <view class="form-item">
+        <view class="form-label">联系人</view>
+        <input 
+          class="form-input" 
+          placeholder="请输入联系人姓名"
+          value="{{form.contactName}}"
+          data-field="contactName"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 联系电话 -->
+      <view class="form-item">
+        <view class="form-label">联系电话 <text class="required">*</text></view>
+        <input 
+          class="form-input" 
+          type="number"
+          placeholder="请输入手机号码"
+          value="{{form.contactPhone}}"
+          data-field="contactPhone"
+          bindinput="onInput"
+        />
+      </view>
+    </view>
+
+    <!-- 营业执照 -->
+    <view class="form-section">
+      <view class="section-title">资质证明</view>
+      
+      <view class="form-item">
+        <view class="form-label">营业执照 <text class="required">*</text></view>
+        <view class="upload-area" bindtap="chooseImage">
+          <block wx:if="{{form.businessLicense}}">
+            <image class="uploaded-image" src="{{form.businessLicense}}" mode="aspectFit"></image>
+            <view class="reupload-overlay">
+              <text class="reupload-icon">📷</text>
+              <text class="reupload-text">点击重新上传</text>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="upload-icon">+</view>
+            <view class="upload-text">上传营业执照</view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务分类 -->
+    <view class="form-section">
+      <view class="section-title">服务分类</view>
+      <view class="category-tips">可多选，选择您提供的服务类型</view>
+      
+      <view class="category-grid">
+        <view 
+          wx:for="{{availableCategories}}" 
+          wx:key="index"
+          class="category-tag-item"
+        >
+          <view
+            class="category-tag {{selectedMap[item] ? 'selected' : ''}}"
+            bindtap="toggleCategory"
+            data-category="{{item}}"
+          >
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 公司简介 -->
+    <view class="form-section">
+      <view class="section-title">公司简介</view>
+      
+      <view class="form-item">
+        <textarea 
+          class="form-textarea" 
+          placeholder="请简单介绍一下您的公司和服务优势..."
+          value="{{form.description}}"
+          data-field="description"
+          bindinput="onInput"
+          maxlength="500"
+        ></textarea>
+        <view class="char-count">{{form.description.length || 0}}/500</view>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view style="height: {{formBottomSpacer}}px;"></view>
+  </scroll-view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-bar" style="padding-bottom: {{bottomSafeHeight}}px;">
+    <view class="submit-btn {{isSubmitting ? 'disabled' : ''}}" bindtap="submitForm">
+      提交申请
+    </view>
+  </view>
+</view>

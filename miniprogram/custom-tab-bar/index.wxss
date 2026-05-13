@@ -19,6 +19,12 @@
   align-items: center;
   gap: 4rpx;
   position: relative;
+  flex: 1;
+}
+
+.tab-icon-text {
+  font-size: 44rpx;
+  line-height: 1;
 }
 
 .tab-icon {
@@ -42,8 +48,9 @@
 
 .notification-dot {
   position: absolute;
-  top: -10rpx;
-  right: -10rpx;
+  top: -4rpx;
+  right: 50%;
+  transform: translateX(20rpx);
   z-index: 10;
 }
 

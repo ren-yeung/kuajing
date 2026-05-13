@@ -1,3 +1,5 @@
+const login = require('../../utils/login.js');
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -10,10 +12,12 @@ Page({
     form: {
       title: '',
       description: '',
-      phone: '',
-      region: '',
-      remark: ''
-    }
+      budgetMin: '',
+      budgetMax: '',
+      deadline: '',
+      phone: ''
+    },
+    isSubmitting: false
   },
 
   onLoad() {
@@ -29,11 +33,8 @@ Page({
       bottomSafeHeight = windowHeight - safeArea.bottom;
     }
 
-    // 提交栏实际高度(px)：padding 24rpx*2 + 按钮 80rpx + 安全区
     const submitBarPx = (24 * 2 + 80) * windowWidth / 750 + bottomSafeHeight;
     const scrollViewHeight = windowHeight - navHeight - submitBarPx;
-
-    // 底部留白(rpx)：90rpx基础 + iOS安全区换算成rpx
     const formBottomSpacer = 90 + Math.round(bottomSafeHeight * 750 / windowWidth);
 
     this.setData({
@@ -67,9 +68,18 @@ Page({
     });
   },
 
+  // 选择日期
+  onDateChange(e) {
+    this.setData({
+      'form.deadline': e.detail.value
+    });
+  },
+
   // 提交表单
   submitForm() {
-    const { form, selectedCategory } = this.data;
+    const { form, selectedCategory, isSubmitting } = this.data;
+
+    if (isSubmitting) return;
 
     // 表单验证
     if (!form.title.trim()) {
@@ -80,27 +90,40 @@ Page({
       wx.showToast({ title: '请输入需求描述', icon: 'none' });
       return;
     }
-    if (!form.phone.trim()) {
-      wx.showToast({ title: '请输入联系电话', icon: 'none' });
-      return;
-    }
-    if (!form.region.trim()) {
-      wx.showToast({ title: '请输入需求地区', icon: 'none' });
-      return;
-    }
 
-    // 提交数据
-    const submitData = {
-      ...form,
-      category: selectedCategory
-    };
+    this.setData({ isSubmitting: true });
+    wx.showLoading({ title: '发布中...' });
 
-    console.log('发布需求:', submitData);
-
-    // 模拟提交成功
-    wx.showToast({ title: '发布成功', icon: 'success' });
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+    // 调用云函数发布需求
+    wx.cloud.callFunction({
+      name: 'publishDemand',
+      data: {
+        title: form.title.trim(),
+        category: selectedCategory,
+        description: form.description.trim(),
+        budgetMin: form.budgetMin ? parseFloat(form.budgetMin) : 0,
+        budgetMax: form.budgetMax ? parseFloat(form.budgetMax) : 0,
+        deadline: form.deadline || '',
+        phone: form.phone || ''
+      },
+      success: (res) => {
+        wx.hideLoading();
+        if (res.result && res.result.success) {
+          wx.showToast({ title: '发布成功', icon: 'success' });
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 1500);
+        } else {
+          this.setData({ isSubmitting: false });
+          wx.showToast({ title: res.result.errMsg || '发布失败', icon: 'none' });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        this.setData({ isSubmitting: false });
+        console.error('发布需求失败', err);
+        wx.showToast({ title: '网络错误，请重试', icon: 'none' });
+      }
+    });
   }
 });

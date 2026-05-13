@@ -45,7 +45,7 @@
     "disableSWC": true
   },
   "appid": "wxc125919431b74f14",
-  "projectname": "quickstart-wx-cloud",
+  "projectname": "跨境服务圈",
   "libVersion": "2.20.1",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "condition": {

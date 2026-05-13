@@ -1,0 +1,134 @@
+<!-- 整个固定区域：导航栏 + 搜索 + 分类导航 -->
+<view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 导航栏 -->
+  <view class="nav-content">
+    <text class="nav-title">需求广场</text>
+  </view>
+  
+  <!-- 搜索栏 -->
+  <view class="search-section" bindtap="goSearch">
+    <view class="search-bar">
+      <image src="/images/search.png" class="search-icon"></image>
+      <text class="search-placeholder">搜索需求、商家</text>
+    </view>
+  </view>
+  
+  <!-- 分类导航 - 横向滚动 -->
+  <view class="category-nav">
+    <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="category-list">
+        <view 
+          class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}" 
+          wx:for="{{categories}}" 
+          wx:key="id" 
+          bindtap="selectCategory" 
+          data-id="{{item.id}}"
+        >
+          <view class="category-icon" style="background: {{item.bgColor}};">
+            <text>{{item.icon}}</text>
+          </view>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+  
+  <!-- Tab切换 -->
+  <view class="tab-section">
+    <view class="tab-item {{activeTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">
+      <text>全部需求</text>
+      <view class="tab-line" wx:if="{{activeTab === 'all'}}"></view>
+    </view>
+    <view class="tab-item {{activeTab === 'my' ? 'active' : ''}}" bindtap="switchTab" data-tab="my">
+      <text>我的需求</text>
+      <view class="tab-line" wx:if="{{activeTab === 'my'}}"></view>
+    </view>
+  </view>
+</view>
+
+<!-- 占位：顶出固定区域高度 -->
+<view style="height: {{fixedTopHeight}}px;"></view>
+
+<!-- 可滚动区域：需求卡片 -->
+<scroll-view 
+  class="demand-scroll" 
+  scroll-y 
+  enhanced 
+  show-scrollbar="{{false}}"
+  bindscrolltolower="loadMore"
+>
+  <!-- 顶部间距占位 -->
+  <view style="height: 16px;"></view>
+
+  <!-- 需求卡片列表 -->
+
+  <!-- 需求卡片列表 -->
+  <view class="demand-card" wx:for="{{demands}}" wx:key="id" bindtap="goDemandDetail" data-id="{{item.id}}">
+    <!-- 用户信息行：头像 + 用户名 + 时间 -->
+    <view class="demand-header">
+      <view class="user-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">
+        {{item.avatarText}}
+      </view>
+      <view class="user-info">
+        <text class="user-name">{{item.userName}}</text>
+        <text class="post-time">{{item.postTime}}</text>
+      </view>
+    </view>
+
+    <!-- 标题 -->
+    <text class="demand-title">{{item.title}}</text>
+
+    <!-- 描述（最多2行） -->
+    <text class="demand-desc">{{item.description}}</text>
+
+    <!-- 标签 -->
+    <view class="demand-tags">
+      <text class="tag-item" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="index">{{tag}}</text>
+    </view>
+
+    <!-- 预算 + 截止日期 同一行 -->
+    <view class="demand-meta">
+      <view class="budget-info">
+        <text class="budget-label">预算：</text>
+        <text class="budget-amount">{{item.budget}}</text>
+      </view>
+      <text class="deadline">截止：{{item.deadline}}</text>
+    </view>
+
+    <!-- 底部：统计 + 报名按钮 -->
+    <view class="demand-footer">
+      <view class="stats-left">
+        <text class="stat-item">👁️ {{item.views}}</text>
+        <text class="stat-item">📝 {{item.applyCount}}人报名</text>
+      </view>
+      <view class="apply-btn" catchtap="applyDemand" data-id="{{item.id}}">
+        <text>立即报名</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-more" wx:if="{{demands.length > 0}}">
+    <text wx:if="{{hasMore}}">加载中...</text>
+    <text wx:else>没有更多了</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{demands.length === 0 && !isLoading}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无需求</text>
+    <text class="empty-hint">发布需求，让服务商主动联系你</text>
+  </view>
+
+  <!-- 底部安全距离 -->
+  <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 8 : 8}}px;"></view>
+</scroll-view>
+
+<!-- 悬浮发布按钮 -->
+<view
+  class="fab-button"
+  style="bottom: {{fabBottom}}px;"
+  bindtap="publishDemand"
+>
+  <image src="/images/plus-white.png" class="fab-icon"></image>
+</view>

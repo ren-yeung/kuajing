@@ -1,0 +1,360 @@
+/* 页面整体 */
+page {
+  background: #f5f5f5;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== 固定区域 ========== */
+.fixed-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 1000;
+}
+
+.nav-content {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* 搜索栏 */
+.search-section {
+  padding: 8px 16px 12px;
+}
+
+.search-bar {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.search-placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+/* 分类导航 - 横向滚动 */
+.category-nav {
+  padding: 12px 0 16px;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.category-scroll {
+  white-space: nowrap;
+}
+
+.category-list {
+  display: inline-flex;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+}
+
+.category-item.active .category-icon {
+  transform: scale(1.05);
+}
+
+.category-item.active .category-name {
+  color: #07C160;
+  font-weight: 600;
+}
+
+.category-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+
+.category-name {
+  font-size: 11px;
+  color: #333;
+  transition: color 0.2s;
+}
+
+/* Tab切换 */
+.tab-section {
+  display: flex;
+  padding: 0 16px;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.tab-item {
+  position: relative;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tab-item text {
+  font-size: 15px;
+  color: #999;
+  font-weight: 400;
+}
+
+.tab-item.active text {
+  color: #000;
+  font-weight: 600;
+}
+
+.tab-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: #07C160;
+  border-radius: 2px;
+}
+
+/* 可滚动区域 - 白色背景 */
+.demand-scroll {
+  background: white;
+  height: calc(100vh - 350px) !important;
+  flex: 1;
+}
+
+/* 需求卡片 */
+.demand-card {
+  margin: 0 28rpx 24rpx;
+  background: white;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  border: 0.5px solid #e8e8e8;
+}
+
+/* 用户信息行 */
+.demand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16rpx;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  display: block;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #999;
+  display: block;
+}
+
+/* 标题 */
+.demand-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  display: block;
+  margin-bottom: 10rpx;
+  line-height: 1.4;
+}
+
+/* 描述（最多2行） */
+.demand-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+/* 标签 */
+.demand-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+
+.tag-item {
+  padding: 6rpx 16rpx;
+  background: #f5f7fa;
+  border-radius: 6rpx;
+  font-size: 12px;
+  color: #555;
+}
+
+/* 预算 + 截止日期 行 */
+.demand-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  font-size: 12px;
+  color: #999;
+}
+
+.budget-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.budget-label {
+  color: #999;
+}
+
+.budget-amount {
+  color: #ff6b35;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.deadline {
+  color: #999;
+}
+
+/* 底部：统计 + 报名按钮 */
+.demand-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12rpx;
+}
+
+.stats-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.stat-item {
+  font-size: 12px;
+  color: #888;
+}
+
+/* 立即报名按钮 - 绿色圆角 */
+.apply-btn {
+  padding: 8px 20px;
+  background: #07C160;
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 加载状态 */
+.loading-more {
+  text-align: center;
+  padding: 16px;
+  color: #999;
+  font-size: 13px;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-hint {
+  font-size: 13px;
+  color: #999;
+}
+
+/* 底部安全距离 */
+.safe-bottom {
+  height: 20px;
+}
+
+/* 悬浮发布按钮 */
+.fab-button {
+  position: fixed;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #07C160;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+  z-index: 100;
+}
+
+.fab-icon {
+  width: 24px;
+  height: 24px;
+}

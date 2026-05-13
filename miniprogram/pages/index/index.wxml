@@ -1,20 +1,21 @@
-<!-- 整个固定区域：导航栏 + 搜索 + 分类导航 + 推荐服务标题 -->
+<!-- 整个固定区域：导航栏 + 搜索 + 分类导航 + 推荐服务/需求标题 -->
 <view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
   <!-- 导航栏 -->
   <view class="nav-content">
-    <text class="nav-title">服务广场</text>
+    <text class="nav-title">{{currentRole === 'merchant' ? '需求广场' : '服务广场'}}</text>
   </view>
   <!-- 搜索栏 -->
   <view class="search-section" bindtap="goSearch">
     <view class="search-bar">
       <image src="/images/search.png" class="search-icon"></image>
-      <text class="search-placeholder">搜索服务、商家</text>
+      <text class="search-placeholder">{{currentRole === 'merchant' ? '搜索需求' : '搜索服务、商家'}}</text>
     </view>
   </view>
-  <!-- 分类导航 -->
-  <view class="category-section">
+  
+  <!-- 用户版本：服务广场分类导航 -->
+  <view class="category-section" wx:if="{{currentRole !== 'merchant'}}">
     <view class="category-list">
-      <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="selectCategory" data-id="{{item.id}}">
+      <view class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" bindtap="selectCategory" data-id="{{item.id}}">
         <view class="category-icon" style="background: {{item.bgColor}};">
           <text>{{item.icon}}</text>
         </view>
@@ -22,10 +23,27 @@
       </view>
     </view>
   </view>
-  <!-- 推荐服务标题 -->
-  <view class="section-header">
-    <text class="section-title">推荐服务</text>
-    <text class="section-tab" bindtap="switchTab" data-tab="my">我的需求</text>
+  
+  <!-- 商家版本：需求广场分类导航 - 两行网格 -->
+  <view class="category-section merchant-category" wx:if="{{currentRole === 'merchant'}}">
+    <view class="category-list">
+      <view class="category-item {{selectedDemandCategoryId === item.id ? 'active' : ''}}" 
+            wx:for="{{demandCategories}}" 
+            wx:key="id" 
+            bindtap="selectDemandCategory" 
+            data-id="{{item.id}}">
+        <view class="category-icon" style="background: {{item.bgColor}};">
+          <text>{{item.icon}}</text>
+        </view>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 推荐服务/需求标题 -->
+  <view class="section-header" style="border-bottom: none;">
+    <text class="section-title">{{currentRole === 'merchant' ? '最新需求' : '推荐服务'}}</text>
+    <text class="section-tab" bindtap="switchTab" data-tab="my">{{currentRole === 'merchant' ? '我的服务' : '我的需求'}}</text>
     <text class="section-more" bindtap="viewMore">查看更多 ></text>
   </view>
 </view>
@@ -33,7 +51,7 @@
 <!-- 占位：顶出固定区域高度 -->
 <view style="height: {{fixedTopHeight}}px;"></view>
 
-<!-- 可滚动区域：服务卡片 -->
+<!-- 可滚动区域：服务卡片 或 需求卡片 -->
 <scroll-view 
   class="service-scroll" 
   scroll-y 
@@ -41,33 +59,117 @@
   show-scrollbar="{{false}}"
   style="height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px);"
 >
-  <!-- 顶部间距占位（随内容滚动，不遮挡卡片） -->
-  <view style="height: 16px;"></view>
+  <!-- 顶部间距占位（卡片紧贴标题） -->
+  <view style="height: 0;"></view>
 
-  <!-- 服务卡片 -->
-  <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
-    <view class="card-inner">
-      <view class="service-image" style="background: {{item.gradient}};">
-        <text>服务图片</text>
-      </view>
-      <view class="service-info">
-        <text class="service-title">{{item.title}}</text>
-        <view class="service-provider">
-          <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
-          <text class="provider-name">{{item.provider}}</text>
-          <text class="provider-rating">⭐ {{item.rating}}</text>
+  <!-- 用户版本：服务卡片列表 -->
+  <block wx:if="{{currentRole !== 'merchant'}}">
+    <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
+      <view class="card-inner">
+        <view class="service-image" style="background: {{item.gradient}};">
+          <text>服务图片</text>
         </view>
-        <text class="service-desc">{{item.desc}}</text>
-        <view class="service-stats">
-          <view class="stats-left">
-            <text class="stat-item">❤️ {{item.likes}}</text>
-            <text class="stat-item">👁️ {{item.views}}</text>
+        <view class="service-info">
+          <!-- 第一行：服务商信息 + 分类标签 -->
+          <view class="service-info-header">
+            <view class="service-provider">
+              <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+              <text class="provider-name">{{item.provider}}</text>
+              <text class="provider-rating">⭐ {{item.rating}}</text>
+            </view>
+            <text class="category-tag active" wx:if="{{item.categoryName}}">{{item.categoryName}}</text>
           </view>
-          <view class="contact-btn" catchtap="contactService" data-id="{{item.id}}">立即咨询</view>
+          <!-- 标题 -->
+          <text class="service-title">{{item.title}}</text>
+          <!-- 描述 -->
+          <text class="service-desc">{{item.desc}}</text>
+          <!-- 底部统计 -->
+          <view class="service-footer">
+            <view class="stats-left">
+              <text class="stat-item">❤️ {{item.likes}}</text>
+              <text class="stat-item">👁️ {{item.views}}</text>
+            </view>
+            <view class="contact-btn" catchtap="contactService" data-id="{{item.id}}">立即咨询</view>
+          </view>
         </view>
       </view>
     </view>
-  </view>
+  </block>
+
+  <!-- 商家版本：需求卡片 或 商家服务列表 -->
+  <block wx:if="{{currentRole === 'merchant'}}">
+    <!-- 推荐需求列表 -->
+    <block wx:if="{{merchantActiveTab === 'recommend'}}">
+      <view class="demand-card" wx:for="{{demands}}" wx:key="id" bindtap="goDemandDetail" data-id="{{item.id}}">
+        <!-- 用户信息行：头像 + 用户名 + 时间 -->
+        <view class="demand-header">
+          <view class="demand-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+          <view class="demand-user-info">
+            <text class="demand-user-name">{{item.userName}}</text>
+            <text class="demand-post-time">{{item.postTime}}</text>
+          </view>
+        </view>
+
+        <!-- 标题 -->
+        <text class="demand-title">{{item.title}}</text>
+
+        <!-- 描述（最多2行） -->
+        <text class="demand-desc">{{item.description}}</text>
+
+        <!-- 标签 -->
+        <view class="demand-tags">
+          <text class="demand-tag" wx:for="{{item.tags}}" wx:key="index" wx:for-item="tag">{{tag}}</text>
+        </view>
+
+        <!-- 预算 + 截止日期 同一行 -->
+        <view class="demand-meta">
+          <view class="demand-budget">预算：{{item.budget}}</view>
+          <text class="demand-deadline">截止：{{item.deadline}}</text>
+        </view>
+
+        <!-- 底部：统计 + 报名按钮 -->
+        <view class="demand-footer">
+          <view class="demand-stats">
+            <text class="demand-stat">👁️ {{item.views}}</text>
+            <text class="demand-stat">📝 {{item.applyCount}}人报名</text>
+          </view>
+          <view class="apply-btn" catchtap="applyDemand" data-id="{{item.id}}">立即报名</view>
+        </view>
+      </view>
+    </block>
+    
+    <!-- 我的服务列表 -->
+    <block wx:if="{{merchantActiveTab === 'my'}}">
+      <view class="service-card" wx:for="{{merchantServices}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
+        <view class="card-inner">
+          <view class="service-image" style="background: {{item.gradient}};">
+            <text>服务图片</text>
+          </view>
+          <view class="service-info">
+            <text class="service-title">{{item.title}}</text>
+            <view class="service-provider">
+              <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+              <text class="provider-name">{{item.provider}}</text>
+              <text class="provider-rating">⭐ {{item.rating}}</text>
+            </view>
+            <text class="service-desc">{{item.desc}}</text>
+            <view class="service-stats">
+              <view class="stats-left">
+                <text class="stat-item">❤️ {{item.likes}}</text>
+                <text class="stat-item">👁️ {{item.views}}</text>
+              </view>
+              <view class="contact-btn" catchtap="contactService" data-id="{{item.id}}">立即咨询</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 无服务时提示 -->
+      <view class="empty-tip" wx:if="{{merchantServices.length === 0 && !isLoading}}">
+        <text>暂无我的服务</text>
+      </view>
+    </block>
+  </block>
 
   <!-- 底部安全距离 -->
   <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 8 : 8}}px;"></view>

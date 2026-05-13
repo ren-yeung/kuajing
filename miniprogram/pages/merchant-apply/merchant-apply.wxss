@@ -1,0 +1,247 @@
+/* 商家入驻申请页面样式 */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  align-items: stretch;
+}
+
+/* 导航栏 */
+.nav-bar {
+  background: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 16px;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 60px;
+}
+
+.back-arrow {
+  font-size: 28px;
+  color: #333;
+  line-height: 1;
+}
+
+.back-text {
+  font-size: 15px;
+  color: #333;
+}
+
+.nav-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right-placeholder {
+  width: 60px;
+}
+
+/* 表单区域 */
+.form-scroll {
+  padding-top: 0;
+}
+
+.form-section {
+  background: #fff;
+  margin-bottom: 12px;
+  padding: 16px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 16px;
+  background: #07C160;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.form-item {
+  margin-bottom: 16px;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.required {
+  color: #ff4d4f;
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 120px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* 上传区域 */
+.upload-area {
+  width: 100%;
+  height: 180px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.upload-icon {
+  font-size: 40px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #999;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.reupload-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 8px 8px;
+}
+
+.reupload-icon {
+  font-size: 14px;
+}
+
+.reupload-text {
+  font-size: 11px;
+  color: #fff;
+}
+
+/* 分类选择 */
+.category-tips {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.category-tag-item {
+  width: 33.33%;
+  padding: 6px 4px;
+  box-sizing: border-box;
+}
+
+.category-tag {
+  display: block;
+  padding: 10px 8px;
+  background: #f5f5f5;
+  border-radius: 24px;
+  font-size: 13px;
+  color: #666;
+  border: 1px solid transparent;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.category-tag.selected {
+  background: #07C160 !important;
+  color: #fff !important;
+  border-color: #07C160 !important;
+}
+
+/* 提交按钮 */
+.submit-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 12px 16px;
+  padding-top: 12px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.submit-btn {
+  height: 44px;
+  background: #07C160;
+  color: #fff;
+  border-radius: 22px;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-btn.disabled {
+  background: #ccc;
+}
