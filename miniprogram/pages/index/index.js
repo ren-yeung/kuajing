@@ -87,7 +87,7 @@ Page({
     this.setData({
       statusBarHeight: statusBarHeight,
       navHeight: statusBarHeight + navContentHeight,
-      fixedTopHeight: currentRole === 'merchant' ? 320 : 370,
+      fixedTopHeight: 0,
       bottomSafeHeight: bottomSafeHeight,
       tabBarOuterHeight: tabBarOuterHeight,
       rpxToPx: rpxToPx,
@@ -111,18 +111,21 @@ Page({
     const prevRole = this.data.currentRole;
     
     this.setData({ currentRole: currentRole });
-    this.calcFixedTopHeight();
+
+    // 只在首次加载或角色切换时计算固定区域高度
+    if (!this.data._fixedTopHeightCached || prevRole !== currentRole) {
+      this.calcFixedTopHeight();
+      this.data._fixedTopHeightCached = true;
+    }
 
     // 根据角色加载对应内容
     if (currentRole === 'merchant') {
       // 商家版本：显示需求广场
-      this.setData({ fixedTopHeight: 320 });
       if (this.data.demands.length === 0 || prevRole !== currentRole) {
         this.refreshDemands();
       }
     } else {
       // 用户版本：显示服务广场
-      this.setData({ fixedTopHeight: 370 });
       if (this.data.services.length === 0 || prevRole !== currentRole) {
         this.refreshServices();
       }
@@ -652,6 +655,7 @@ Page({
           const margin = 10 + 30 * rpxToPx;
 
           const fabMinBottom = tabBarOuterHeight + margin;
+          // fabMaxBottom = 屏幕高度 - 固定区域高度 - 按钮高度 - 边距（限制在服务卡片区域内）
           const fabMaxBottom = windowHeight - rect.height - buttonHeight - margin;
 
           self.setData({
@@ -825,9 +829,9 @@ Page({
               url: '/pages/publish-need/publish-need'
             });
           } else {
-            // 发布服务
+            // 发布服务 - 跳转到新的发布服务页面
             wx.navigateTo({
-              url: '/pages/publish-need/publish-need?type=service'
+              url: '/pages/publish-service/publish-service'
             });
           }
         }
@@ -848,9 +852,9 @@ Page({
               url: '/pages/publish-need/publish-need'
             });
           } else if (isApprovedMerchant) {
-            // 已审核商家：发布服务
+            // 已审核商家：发布服务 - 跳转到新的发布服务页面
             wx.navigateTo({
-              url: '/pages/publish-need/publish-need?type=service'
+              url: '/pages/publish-service/publish-service'
             });
           } else {
             // 未审核用户：成为商家

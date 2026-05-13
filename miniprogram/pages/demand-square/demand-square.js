@@ -62,6 +62,11 @@ Page({
   },
 
   onShow() {
+    // 设置自定义tabBar：首页=0（根据角色决定是服务广场还是需求广场）
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 0 });
+    }
+
     this.calcFixedTopHeight();
     if (this.data.demands.length === 0) {
       const mockData = this.getMockDemands();

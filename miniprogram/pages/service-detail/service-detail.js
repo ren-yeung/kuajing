@@ -83,7 +83,8 @@ Page({
       category: data.category,
       description: data.description,
       price: data.price,
-      priceUnit: '/次',
+      priceUnit: data.priceUnit || '元',
+      phone: data.phone || '',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       provider: {
         name: merchant.nickname || '匿名商家',
@@ -335,8 +336,13 @@ Page({
 
   // 电话
   callMerchant() {
+    const phone = this.data.service && this.data.service.phone;
+    if (!phone) {
+      wx.showToast({ title: '暂无联系电话', icon: 'none' });
+      return;
+    }
     wx.makePhoneCall({
-      phoneNumber: '13800000000',
+      phoneNumber: phone,
       fail() {}
     });
   },

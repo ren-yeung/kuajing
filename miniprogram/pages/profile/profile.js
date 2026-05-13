@@ -28,6 +28,7 @@ Page({
     logDate: '',
     logText: '',
     unreadCount: 0,
+    menuScrollTop: 0,
     avatarUrl: '',
     nickname: '',
     pendingAvatar: '',
@@ -67,6 +68,9 @@ Page({
   },
 
   onShow() {
+    // 每次进入页面时重置滚动位置
+    this.setData({ menuScrollTop: 0 });
+
     // 设置自定义tabBar：我的=2（首页=0，消息=1，我的=2）
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
@@ -78,13 +82,47 @@ Page({
       var isMerchant = userInfo.isMerchant || false;
       var currentRole = login.getCurrentRole();
       var switchRoleText = login.getSwitchRoleText();
-      this.setData({
-        isLoggedIn: true,
-        userInfo: userInfo,
-        isMerchant: isMerchant,
-        currentRole: currentRole,
-        switchRoleText: switchRoleText
-      });
+      
+      // 如果是云存储fileID，转换为临时URL
+      var avatarUrl = userInfo.avatar;
+      if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+        wx.cloud.getTempFileURL({
+          fileList: [avatarUrl],
+          success: (res) => {
+            if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
+              avatarUrl = res.fileList[0].tempFileURL;
+            }
+            userInfo.avatar = avatarUrl;
+            this.setData({
+              isLoggedIn: true,
+              userInfo: userInfo,
+              isMerchant: isMerchant,
+              currentRole: currentRole,
+              switchRoleText: switchRoleText,
+              avatarUrl: avatarUrl
+            });
+          },
+          fail: () => {
+            this.setData({
+              isLoggedIn: true,
+              userInfo: userInfo,
+              isMerchant: isMerchant,
+              currentRole: currentRole,
+              switchRoleText: switchRoleText,
+              avatarUrl: avatarUrl
+            });
+          }
+        });
+      } else {
+        this.setData({
+          isLoggedIn: true,
+          userInfo: userInfo,
+          isMerchant: isMerchant,
+          currentRole: currentRole,
+          switchRoleText: switchRoleText,
+          avatarUrl: avatarUrl
+        });
+      }
       this.loadUserStats();
     } else {
       // 未登录时计算分类网格高度
@@ -126,6 +164,74 @@ Page({
     this.setData({ pendingAvatar: avatarUrl, avatarUrl: avatarUrl });
   },
 
+  // 选择本地图片作为头像
+  onChooseLocalImage: function() {
+    var self = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function(res) {
+        var tempFilePath = res.tempFilePaths[0];
+        
+        // 立即显示选择的图片
+        self.setData({ avatarUrl: tempFilePath });
+        
+        // 如果已登录，上传到云存储并更新
+        if (self.data.isLoggedIn && self.data.userInfo) {
+          wx.showLoading({ title: '上传头像...' });
+          var timestamp = Date.now();
+          
+          wx.saveFile({
+            tempFilePath: tempFilePath,
+            success: function(saveRes) {
+              wx.cloud.uploadFile({
+                cloudPath: 'avatars/' + timestamp + '.png',
+                filePath: saveRes.savedFilePath,
+                success: function(uploadRes) {
+                  wx.hideLoading();
+                  var newAvatarUrl = uploadRes.fileID;
+                  
+                  // 更新本地存储的用户信息
+                  var userInfo = self.data.userInfo;
+                  userInfo.avatar = newAvatarUrl;
+                  wx.setStorageSync('userInfo', userInfo);
+                  self.setData({ userInfo: userInfo });
+                  
+                  // 转换为临时URL显示
+                  wx.cloud.getTempFileURL({
+                    fileList: [newAvatarUrl],
+                    success: function(urlRes) {
+                      if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+                        userInfo.avatar = urlRes.fileList[0].tempFileURL;
+                        self.setData({ userInfo: userInfo, avatarUrl: urlRes.fileList[0].tempFileURL });
+                      }
+                    }
+                  });
+                  
+                  wx.showToast({ title: '头像更新成功', icon: 'none' });
+                },
+                fail: function(err) {
+                  wx.hideLoading();
+                  console.error('头像上传失败', err);
+                  wx.showToast({ title: '头像上传失败', icon: 'none' });
+                }
+              });
+            },
+            fail: function(err) {
+              wx.hideLoading();
+              console.error('头像保存失败', err);
+              wx.showToast({ title: '头像处理失败', icon: 'none' });
+            }
+          });
+        } else {
+          // 未登录，保存待上传
+          self.setData({ pendingAvatar: tempFilePath });
+        }
+      }
+    });
+  },
+
   // 昵称输入
   onNicknameInput: function(e) {
     this.setData({ pendingNickname: e.detail.value });
@@ -153,27 +259,93 @@ Page({
 
     this.setData({ nickname: pendingNickname.trim(), avatarUrl: pendingAvatar });
 
-    login.doLoginWithInfo(pendingNickname.trim(), pendingAvatar)
+    // 如果是微信临时路径，需要上传到云存储
+    if (pendingAvatar.startsWith('http://tmp') || pendingAvatar.startsWith('wxfile://')) {
+      wx.showLoading({ title: '上传头像...' });
+      var timestamp = Date.now();
+      
+      // 先保存到本地，再用本地路径上传
+      wx.saveFile({
+        tempFilePath: pendingAvatar,
+        success: function(saveRes) {
+          var localPath = saveRes.savedFilePath;
+          wx.cloud.uploadFile({
+            cloudPath: 'avatars/' + timestamp + '.png',
+            filePath: localPath,
+            success: function(uploadRes) {
+              wx.hideLoading();
+              console.log('头像上传成功:', uploadRes.fileID);
+              self.doLoginProcess(pendingNickname.trim(), uploadRes.fileID);
+            },
+            fail: function(err) {
+              wx.hideLoading();
+              console.error('头像上传失败', err);
+              wx.showToast({ title: '头像上传失败', icon: 'none' });
+              self.doLoginProcess(pendingNickname.trim(), pendingAvatar);
+            }
+          });
+        },
+        fail: function(err) {
+          wx.hideLoading();
+          console.error('头像保存失败', err);
+          wx.showToast({ title: '头像处理失败', icon: 'none' });
+          self.doLoginProcess(pendingNickname.trim(), pendingAvatar);
+        }
+      });
+    } else {
+      this.doLoginProcess(pendingNickname.trim(), pendingAvatar);
+    }
+  },
+
+  // 实际执行登录流程
+  doLoginProcess: function(nickname, avatar) {
+    var self = this;
+    login.doLoginWithInfo(nickname, avatar)
       .then(function(userInfo) {
         var isMerchant = userInfo.isMerchant || false;
         var currentRole = login.getCurrentRole();
         var switchRoleText = login.getSwitchRoleText();
-        self.setData({
-          isLoggedIn: true,
-          userInfo: userInfo,
-          isMerchant: isMerchant,
-          currentRole: currentRole,
-          switchRoleText: switchRoleText,
-          nickname: userInfo.nickname,
-          avatarUrl: userInfo.avatar
-        });
-        self.loadUserStats();
-        wx.showToast({ title: '登录成功', icon: 'none' });
-        self.calcFixedTopHeight();
+        
+        // 如果是云存储fileID，需要转换为临时URL
+        var avatarUrl = userInfo.avatar;
+        if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+          wx.cloud.getTempFileURL({
+            fileList: [avatarUrl],
+            success: function(res) {
+              if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
+                avatarUrl = res.fileList[0].tempFileURL;
+              }
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+            },
+            fail: function() {
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+            }
+          });
+        } else {
+          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+        }
       })
       .catch(function(err) {
         wx.showToast({ title: err || '登录失败', icon: 'none' });
       });
+  },
+
+  // 登录完成后设置数据
+  finishLogin: function(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl) {
+    // 同步更新 userInfo.avatar（用于页面显示）
+    userInfo.avatar = avatarUrl;
+    this.setData({
+      isLoggedIn: true,
+      userInfo: userInfo,
+      isMerchant: isMerchant,
+      currentRole: currentRole,
+      switchRoleText: switchRoleText,
+      nickname: userInfo.nickname,
+      avatarUrl: avatarUrl
+    });
+    this.loadUserStats();
+    wx.showToast({ title: '登录成功', icon: 'none' });
+    this.calcFixedTopHeight();
   },
 
   // 未登录：点击分类导航
@@ -185,16 +357,26 @@ Page({
   onSwitchRole: function() {
     var currentRole = this.data.currentRole;
     var newRole = currentRole === 'user' ? 'merchant' : 'user';
-    login.setCurrentRole(newRole);
-    var switchRoleText = login.getSwitchRoleText();
-    this.setData({
-      currentRole: newRole,
-      switchRoleText: switchRoleText
-    });
-    wx.showToast({
-      title: newRole === 'merchant' ? '已切换为商家版本' : '已切换为用户版本',
-      icon: 'none'
-    });
+    
+    if (newRole === 'merchant') {
+      // 切换到商家版，跳转到商家主页
+      login.setCurrentRole('merchant');
+      wx.navigateTo({
+        url: '/pages/merchant-profile/merchant-profile'
+      });
+    } else {
+      // 切换到用户版
+      login.setCurrentRole('user');
+      var switchRoleText = login.getSwitchRoleText();
+      this.setData({
+        currentRole: 'user',
+        switchRoleText: switchRoleText
+      });
+      wx.showToast({
+        title: '已切换为用户版本',
+        icon: 'none'
+      });
+    }
   },
 
   // 退出登录

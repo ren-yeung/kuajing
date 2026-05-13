@@ -5,15 +5,17 @@
     "pages/message/message",
     "pages/profile/profile",
     "pages/publish-need/publish-need",
+    "pages/publish-service/publish-service",
     "pages/service-detail/service-detail",
-    "pages/merchant-apply/merchant-apply"
+    "pages/merchant-apply/merchant-apply",
+    "pages/merchant-profile/merchant-profile"
   ],
   "window": {
     "navigationStyle": "custom",
     "backgroundColor": "#f5f5f5"
   },
   "tabBar": {
-    "custom": true,
+    "custom": false,
     "color": "#999999",
     "selectedColor": "#07C160",
     "backgroundColor": "#ffffff",

@@ -10,7 +10,7 @@
     <!-- 主体：头像在左，昵称+登录垂直排列在右 -->
     <view class="member-card-body">
       <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-        <image class="default-avatar" src="{{avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+        <image class="default-avatar" src="{{pendingAvatar || '/images/avatar.png'}}" mode="aspectFill"></image>
       </button>
       <view class="member-card-right">
         <view class="nickname-row">
@@ -33,7 +33,7 @@
   <view wx:else>
     <view class="profile-inner">
       <view class="profile-header">
-        <image class="profile-avatar" src="{{userInfo.avatar}}"></image>
+        <image class="profile-avatar" src="{{userInfo.avatar}}" bindtap="onChooseLocalImage"></image>
         <view class="profile-info">
           <text class="profile-name">{{userInfo.nickname}}</text>
           <text class="profile-mood">{{mood}}</text>
@@ -119,6 +119,7 @@
   scroll-y
   enhanced
   show-scrollbar="{{false}}"
+  scroll-top="{{menuScrollTop}}"
   style="position: fixed; top: {{fixedTopHeight}}px; height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px); width: 100%; background: {{isLoggedIn ? '#ffffff' : '#f5f5f5'}};"
 >
   <!-- 已登录：完整菜单列表 -->
@@ -222,8 +223,8 @@
           </view>
           <view class="menu-item switch-role-btn" wx:else bindtap="onSwitchRole">
             <view class="menu-left">
-              <view class="menu-icon" style="background: #E8F5E9;">🔄</view>
-              <text class="menu-label" style="color: #07C160;">{{switchRoleText}}</text>
+              <view class="menu-icon" style="background: #F5F5F5;">🔄</view>
+              <text class="menu-label">{{switchRoleText}}</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>

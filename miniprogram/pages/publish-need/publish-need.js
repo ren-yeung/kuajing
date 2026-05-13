@@ -6,9 +6,9 @@ Page({
     navHeight: 44,
     scrollViewHeight: 0,
     bottomSafeHeight: 0,
-    formBottomSpacer: 90,
+    formBottomSpacer: 30,
     selectedCategory: '跨境网络',
-    categories: ['跨境网络', '物流服务', '支付结算', '合规认证', '培训咨询', '建站出海', '营销投流', '报关清关', '选品供货', '其他'],
+    categories: ['跨境网络', '物流服务', '报关清关', '支付结算', '合规认证', '培训咨询', '建站出海', '营销投流', '选品特供'],
     form: {
       title: '',
       description: '',
@@ -35,7 +35,7 @@ Page({
 
     const submitBarPx = (24 * 2 + 80) * windowWidth / 750 + bottomSafeHeight;
     const scrollViewHeight = windowHeight - navHeight - submitBarPx;
-    const formBottomSpacer = 90 + Math.round(bottomSafeHeight * 750 / windowWidth);
+    const formBottomSpacer = 30 + Math.round(bottomSafeHeight * 750 / windowWidth);
 
     this.setData({
       statusBarHeight,

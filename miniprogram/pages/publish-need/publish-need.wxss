@@ -132,7 +132,7 @@ page {
 
 /* 提交按钮 */
 .submit-btn {
-  margin: 40rpx 32rpx;
+  margin: 0;
   padding: 24rpx;
   background: #07C160;
   color: white;
@@ -140,7 +140,7 @@ page {
   border-radius: 16rpx;
   font-size: 32rpx;
   font-weight: 500;
-  width: calc(100% - 64rpx);
+  width: 100%;
 }
 
 /* 底部固定按钮栏 */

@@ -77,6 +77,8 @@ exports.main = async (event, context) => {
         category: service.category,
         description: service.description,
         price: service.price || '面议',
+        priceUnit: service.priceUnit || '元',
+        phone: service.phone || '',
         images: service.images || [],
         merchant: merchantInfo,
         likes: service.likes || 0,

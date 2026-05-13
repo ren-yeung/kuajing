@@ -1,0 +1,379 @@
+/* 页面整体 */
+page {
+  background: #f5f5f5;
+  height: 100vh;
+}
+
+/* ========== 导航栏 ========== */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 100;
+}
+
+.nav-content {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding-right: 24rpx;
+}
+
+.back-arrow {
+  font-size: 48rpx;
+  color: #000;
+  line-height: 1;
+}
+
+.back-text {
+  font-size: 30rpx;
+  color: #000;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #000;
+  flex: 1;
+  text-align: center;
+}
+
+.nav-right-placeholder {
+  width: 120rpx;
+}
+
+/* ========== 可滚动区域：表单 ========== */
+.form-scroll {
+  background: white;
+}
+
+.form-group {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.required::after {
+  content: ' *';
+  color: #ff3b30;
+}
+
+.form-input {
+  width: 100%;
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+  box-sizing: border-box;
+  min-height: 88rpx;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+  min-height: 160rpx;
+  box-sizing: border-box;
+}
+
+.form-textarea::placeholder {
+  color: #999;
+}
+
+/* ========== 分类选择 ========== */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+}
+
+.category-option {
+  padding: 20rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #666;
+  background: white;
+}
+
+.category-option.selected {
+  background: #07C160;
+  color: white;
+  border-color: #07C160;
+}
+
+/* ========== 图片上传 ========== */
+.image-upload-area {
+  display: flex;
+  gap: 20rpx;
+  flex-wrap: wrap;
+}
+
+.image-preview {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 16rpx;
+  background: #f5f5f5;
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+.image-preview.main-image {
+  border: 4rpx solid #07C160;
+}
+
+.image-delete {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: #ff3b30;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24rpx;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.main-tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #07C160;
+  color: white;
+  font-size: 20rpx;
+  text-align: center;
+  padding: 6rpx 0;
+}
+
+.image-upload-box {
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed #e0e0e0;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.upload-icon {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.upload-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.upload-tip {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 16rpx;
+}
+
+/* ========== 标签选择 ========== */
+.tag-section {
+  padding-bottom: 20rpx;
+}
+
+.tag-list {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+  margin-bottom: 20rpx;
+}
+
+.tag-option {
+  padding: 12rpx 28rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: white;
+}
+
+.tag-option.tag-selected {
+  background: #e8f8ef;
+  color: #07C160;
+  border-color: #07C160;
+}
+
+.custom-tag-input-group {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.custom-tag-input {
+  flex: 1;
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+  box-sizing: border-box;
+  min-height: 88rpx;
+}
+
+.custom-tag-input::placeholder {
+  color: #999;
+}
+
+.custom-tag-add-btn {
+  padding: 24rpx 28rpx;
+  background: #07C160;
+  color: white;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  flex-shrink: 0;
+  min-height: 88rpx;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.selected-tags-preview {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  min-height: 0;
+}
+
+.selected-tag-item {
+  padding: 8rpx 20rpx;
+  background: #e8f8ef;
+  color: #07C160;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.selected-tag-remove {
+  font-size: 28rpx;
+  line-height: 1;
+  color: #07C160;
+}
+
+/* ========== 价格输入 ========== */
+.price-input-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.price-symbol {
+  font-size: 28rpx;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.price-input {
+  width: 500rpx;
+  flex-shrink: 0;
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+  box-sizing: border-box;
+  min-height: 88rpx;
+}
+
+.price-unit-selector {
+  flex: 1;
+  min-height: 88rpx;
+}
+
+.price-unit-display {
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.arrow-down {
+  font-size: 20rpx;
+  color: #999;
+  flex-shrink: 0;
+}
+
+/* ========== 提交按钮 ========== */
+.submit-btn {
+  margin: 0;
+  padding: 24rpx;
+  background: #07C160;
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  width: 100%;
+}
+
+/* 底部固定按钮栏 */
+.submit-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: white;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}

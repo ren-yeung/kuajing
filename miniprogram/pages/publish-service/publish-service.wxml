@@ -1,0 +1,168 @@
+<!-- 导航栏（固定定位） -->
+<view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+  <view class="nav-content">
+    <view class="nav-back" bindtap="goBack">
+      <text class="back-arrow">‹</text>
+      <text class="back-text">返回</text>
+    </view>
+    <text class="nav-title">发布服务</text>
+    <view class="nav-right-placeholder"></view>
+  </view>
+</view>
+
+<!-- 占位：顶出导航栏高度 -->
+<view style="height: {{navHeight}}px;"></view>
+
+<!-- 可滚动区域：表单 -->
+<scroll-view
+  class="form-scroll"
+  scroll-y
+  enhanced
+  show-scrollbar="{{false}}"
+  style="height: {{scrollViewHeight}}px;"
+>
+  <!-- 服务标题 -->
+  <view class="form-group">
+    <text class="form-label required">服务标题</text>
+    <input
+      class="form-input"
+      placeholder="请输入服务标题，例如：美国专线物流服务"
+      value="{{form.title}}"
+      bindinput="onInput"
+      data-field="title"
+    />
+  </view>
+
+  <!-- 服务分类 -->
+  <view class="form-group">
+    <text class="form-label required">服务分类</text>
+    <view class="category-grid">
+      <view
+        class="category-option {{selectedCategory === item ? 'selected' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="*this"
+        bindtap="selectCategory"
+        data-category="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务描述 -->
+  <view class="form-group">
+    <text class="form-label required">服务描述</text>
+    <textarea
+      class="form-textarea"
+      placeholder="请详细描述您的服务内容、优势、适用场景等"
+      value="{{form.description}}"
+      bindinput="onInput"
+      data-field="description"
+    />
+  </view>
+
+  <!-- 服务图片 -->
+  <view class="form-group">
+    <text class="form-label">服务图片</text>
+    <view class="image-upload-area">
+      <view
+        class="image-preview {{item.isMain ? 'main-image' : ''}}"
+        wx:for="{{form.images}}"
+        wx:key="index"
+        bindtap="previewImage"
+        data-index="{{index}}"
+      >
+        <image src="{{item.url}}" mode="aspectFill" class="preview-img"></image>
+        <view class="image-delete" catchtap="deleteImage" data-index="{{index}}">×</view>
+        <text class="main-tag" wx:if="{{item.isMain}}">封面</text>
+      </view>
+      <view class="image-upload-box" bindtap="chooseImage" wx:if="{{form.images.length < 9}}">
+        <text class="upload-icon">+</text>
+        <text class="upload-text">上传图片</text>
+      </view>
+    </view>
+    <text class="upload-tip">最多上传9张图片，第一张为封面图</text>
+  </view>
+
+  <!-- 服务标签 -->
+  <view class="form-group tag-section">
+    <text class="form-label">服务标签</text>
+    <view class="tag-list">
+      <view
+        class="tag-option {{selectedTags.indexOf(item) !== -1 ? 'tag-selected' : ''}}"
+        wx:for="{{fixedTags}}"
+        wx:key="*this"
+        bindtap="toggleTag"
+        data-tag="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+    <view class="custom-tag-input-group">
+      <input
+        class="custom-tag-input form-input-height"
+        maxlength="8"
+        placeholder="添加自定义标签（最多8个字符）"
+        value="{{customTag}}"
+        bindinput="onTagInput"
+        bindconfirm="addCustomTag"
+      />
+      <view class="custom-tag-add-btn" bindtap="addCustomTag">添加</view>
+    </view>
+    <view class="selected-tags-preview" wx:if="{{selectedTags.length > 0}}">
+      <view
+        class="selected-tag-item"
+        wx:for="{{selectedTags}}"
+        wx:key="*this"
+      >
+        <text>{{item}}</text>
+        <text class="selected-tag-remove" catchtap="removeTag" data-tag="{{item}}">×</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务价格 -->
+  <view class="form-group">
+    <text class="form-label required">服务价格</text>
+    <view class="price-input-group">
+      <text class="price-symbol">¥</text>
+      <input
+        class="price-input form-input-height"
+        type="digit"
+        placeholder="价格"
+        value="{{form.price}}"
+        bindinput="onInput"
+        data-field="price"
+      />
+      <view class="price-unit-selector">
+        <picker mode="selector" range="{{priceUnits}}" value="{{priceUnitIndex}}" bindchange="onPriceUnitChange">
+          <view class="price-unit-display form-input-height">
+            <text>{{priceUnits[priceUnitIndex]}}</text>
+            <text class="arrow-down">▼</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系电话 -->
+  <view class="form-group">
+    <text class="form-label required">联系电话</text>
+    <input
+      class="form-input"
+      type="number"
+      placeholder="请输入联系电话"
+      value="{{form.phone}}"
+      bindinput="onInput"
+      data-field="phone"
+    />
+  </view>
+
+  <!-- 底部留白（避免最后一项被固定按钮遮挡） -->
+  <view style="height: {{formBottomSpacer}}rpx;"></view>
+</scroll-view>
+
+<!-- 底部固定：提交按钮 -->
+<view class="submit-bar">
+  <button class="submit-btn" bindtap="submitForm">发布服务</button>
+</view>

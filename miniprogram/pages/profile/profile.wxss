@@ -434,9 +434,9 @@ page {
 }
 
 .switch-role-btn {
-  background: #F0FFF4;
+  background: white;
 }
 
 .switch-role-btn:active {
-  background: #E8F5E9;
+  background: #f5f5f5;
 }

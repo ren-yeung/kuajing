@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
 
-  const { title, category, description, price, images, serviceFlow, deliveryCycle } = event;
+  const { title, category, description, price, priceUnit, phone, tags, images } = event;
 
   // 参数校验
   if (!title) {
@@ -24,6 +24,12 @@ exports.main = async (event, context) => {
   }
   if (!description) {
     return { success: false, errMsg: '请填写服务描述' };
+  }
+  if (!price) {
+    return { success: false, errMsg: '请填写服务价格' };
+  }
+  if (!phone) {
+    return { success: false, errMsg: '请填写联系电话' };
   }
 
   try {
@@ -45,13 +51,15 @@ exports.main = async (event, context) => {
       data: {
         userId: user._id,
         merchantName: user.nickname,
+        merchantAvatar: user.avatar || '',
         title: title,
         category: category,
         description: description,
-        price: price || '',
+        price: parseFloat(price) || 0,
+        priceUnit: priceUnit || '元',
+        phone: phone || '',
+        tags: tags || [],
         images: images || [],
-        serviceFlow: serviceFlow || '',
-        deliveryCycle: deliveryCycle || '',
         status: 'pending', // 待审核
         rating: '5.0',
         likes: 0,
