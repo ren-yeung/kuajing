@@ -155,8 +155,3 @@ page {
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
   z-index: 100;
 }
-
-/* 底部安全距离 */
-.safe-bottom {
-  height: 40rpx;
-}

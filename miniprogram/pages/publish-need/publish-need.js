@@ -2,6 +2,9 @@ Page({
   data: {
     statusBarHeight: 0,
     navHeight: 44,
+    scrollViewHeight: 0,
+    bottomSafeHeight: 0,
+    formBottomSpacer: 90,
     selectedCategory: '跨境网络',
     categories: ['跨境网络', '物流服务', '支付结算', '合规认证', '培训咨询', '建站出海', '营销投流', '报关清关', '选品供货', '其他'],
     form: {
@@ -17,11 +20,28 @@ Page({
     const systemInfo = wx.getSystemInfoSync();
     const statusBarHeight = systemInfo.statusBarHeight;
     const navHeight = statusBarHeight + 44;
-    const scrollViewHeight = systemInfo.windowHeight - navHeight - 80;
+    const windowHeight = systemInfo.windowHeight;
+    const windowWidth = systemInfo.windowWidth;
+    const safeArea = systemInfo.safeArea;
+    let bottomSafeHeight = 0;
+
+    if (safeArea) {
+      bottomSafeHeight = windowHeight - safeArea.bottom;
+    }
+
+    // 提交栏实际高度(px)：padding 24rpx*2 + 按钮 80rpx + 安全区
+    const submitBarPx = (24 * 2 + 80) * windowWidth / 750 + bottomSafeHeight;
+    const scrollViewHeight = windowHeight - navHeight - submitBarPx;
+
+    // 底部留白(rpx)：90rpx基础 + iOS安全区换算成rpx
+    const formBottomSpacer = 90 + Math.round(bottomSafeHeight * 750 / windowWidth);
+
     this.setData({
       statusBarHeight,
       navHeight,
-      scrollViewHeight
+      scrollViewHeight,
+      bottomSafeHeight,
+      formBottomSpacer
     });
   },
 
@@ -76,17 +96,6 @@ Page({
     };
 
     console.log('发布需求:', submitData);
-
-    // 这里调用后端API提交数据
-    // wx.request({
-    //   url: 'https://your-api.com/publish-need',
-    //   method: 'POST',
-    //   data: submitData,
-    //   success: (res) => {
-    //     wx.showToast({ title: '发布成功', icon: 'success' });
-    //     setTimeout(() => wx.navigateBack(), 1500);
-    //   }
-    // });
 
     // 模拟提交成功
     wx.showToast({ title: '发布成功', icon: 'success' });
