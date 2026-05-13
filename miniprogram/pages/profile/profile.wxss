@@ -214,7 +214,7 @@ page {
   padding: 0 5px;
 }
 
-/* 底部安全距离（不被tab遮挡） */
+/* 底部安全距离 */
 .safe-bottom {
-  height: 50px;
+  height: 20px;
 }

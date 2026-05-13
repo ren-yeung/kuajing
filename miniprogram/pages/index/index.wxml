@@ -39,7 +39,7 @@
   scroll-y 
   enhanced 
   show-scrollbar="{{false}}"
-  style="height: calc(100vh - {{fixedTopHeight}}px - 58px);"
+  style="height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px);"
 >
   <!-- 顶部间距占位（随内容滚动，不遮挡卡片） -->
   <view style="height: 16px;"></view>
@@ -70,10 +70,16 @@
   </view>
 
   <!-- 底部安全距离 -->
-  <view class="safe-bottom"></view>
+  <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 8 : 8}}px;"></view>
 </scroll-view>
 
-<!-- 悬浮发布按钮 -->
-<view class="fab-button" bindtap="publishService">
+<!-- 悬浮发布按钮（可垂直拖动） -->
+<view
+  class="fab-button"
+  style="bottom: {{fabBottom}}px;"
+  catchtouchstart="onFabTouchStart"
+  catchtouchmove="onFabTouchMove"
+  catchtouchend="onFabTouchEnd"
+>
   <image src="/images/plus-white.png" class="fab-icon"></image>
 </view>

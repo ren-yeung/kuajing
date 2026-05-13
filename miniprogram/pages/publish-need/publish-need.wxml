@@ -99,7 +99,7 @@
   </view>
 
   <!-- 底部留白（避免最后一项被固定按钮遮挡） -->
-  <view style="height: 90px;"></view>
+  <view style="height: 180rpx;"></view>
 </scroll-view>
 
 <!-- 底部固定：提交按钮 -->

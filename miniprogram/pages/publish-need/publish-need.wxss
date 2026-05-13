@@ -15,33 +15,33 @@ page {
 }
 
 .nav-content {
-  height: 44px;
+  height: 88rpx;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 32rpx;
   border-bottom: 1rpx solid #e0e0e0;
 }
 
 .nav-back {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding-right: 12px;
+  gap: 8rpx;
+  padding-right: 24rpx;
 }
 
 .back-arrow {
-  font-size: 24px;
+  font-size: 48rpx;
   color: #000;
   line-height: 1;
 }
 
 .back-text {
-  font-size: 15px;
+  font-size: 30rpx;
   color: #000;
 }
 
 .nav-title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 600;
   color: #000;
   flex: 1;
@@ -49,7 +49,7 @@ page {
 }
 
 .nav-right-placeholder {
-  width: 60px;
+  width: 120rpx;
 }
 
 /* ========== 可滚动区域：表单 ========== */
@@ -58,15 +58,15 @@ page {
 }
 
 .form-group {
-  padding: 16px;
+  padding: 32rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
 .form-label {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
   display: block;
 }
 
@@ -77,14 +77,14 @@ page {
 
 .form-input {
   width: 100%;
-  padding: 12px 12px;
+  padding: 24rpx;
   border: 1rpx solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 16rpx;
+  font-size: 28rpx;
   color: #333;
   background: white;
   box-sizing: border-box;
-  min-height: 44px;
+  min-height: 88rpx;
 }
 
 .form-input::placeholder {
@@ -93,13 +93,13 @@ page {
 
 .form-textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 20rpx 24rpx;
   border: 1rpx solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 16rpx;
+  font-size: 28rpx;
   color: #333;
   background: white;
-  min-height: 56px;
+  min-height: 112rpx;
   box-sizing: border-box;
 }
 
@@ -111,15 +111,15 @@ page {
 .category-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 20rpx;
 }
 
 .category-option {
-  padding: 10px;
+  padding: 20rpx;
   border: 1rpx solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 16rpx;
   text-align: center;
-  font-size: 13px;
+  font-size: 26rpx;
   color: #666;
   background: white;
 }
@@ -132,15 +132,15 @@ page {
 
 /* 提交按钮 */
 .submit-btn {
-  margin: 20px 16px;
-  padding: 12px;
+  margin: 40rpx 32rpx;
+  padding: 24rpx;
   background: #07C160;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 16rpx;
+  font-size: 32rpx;
   font-weight: 500;
-  width: calc(100% - 32px);
+  width: calc(100% - 64rpx);
 }
 
 /* 底部固定按钮栏 */
@@ -149,14 +149,14 @@ page {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: white;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
   z-index: 100;
 }
 
 /* 底部安全距离 */
 .safe-bottom {
-  height: 20px;
+  height: 40rpx;
 }

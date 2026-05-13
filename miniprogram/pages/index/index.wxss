@@ -229,15 +229,14 @@ page {
   font-size: 13px;
 }
 
-/* 底部安全距离（tab bar高度约50px + 安全区） */
+/* 底部安全距离 */
 .safe-bottom {
-  height: 40px;
+  height: 20px;
 }
 
-/* 悬浮发布按钮（上移，不被tab挡住） */
+/* 悬浮发布按钮（可垂直拖动，bottom 由 inline style 动态设置） */
 .fab-button {
   position: fixed;
-  bottom: 130px;
   right: 20px;
   width: 50px;
   height: 50px;

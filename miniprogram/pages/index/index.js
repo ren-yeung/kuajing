@@ -3,6 +3,14 @@ Page({
     statusBarHeight: 0,
     navHeight: 0,
     fixedTopHeight: 0,
+    bottomSafeHeight: 0,
+    tabBarOuterHeight: 58,
+    fabBottom: 80,       // 悬浮按钮距底部距离（px）
+    fabMinBottom: 20,    // 最低位置（紧贴服务卡片顶部区域下方）
+    fabMaxBottom: 600,   // 最高位置（初始化后再精确计算）
+    isDragging: false,
+    touchStartY: 0,
+    startBottom: 0,
     activeTab: 'recommend',
     categories: [
       { id: 1, name: '跨境网络', icon: '🌐', bgColor: '#E6F1FB' },
@@ -102,26 +110,85 @@ Page({
     const systemInfo = wx.getSystemInfoSync();
     const statusBarHeight = systemInfo.statusBarHeight;
     const navContentHeight = 44;
+    const windowHeight = systemInfo.windowHeight;
+    const safeArea = systemInfo.safeArea;
+    const windowWidth = systemInfo.windowWidth;
+    const rpxToPx = windowWidth / 750;   // rpx → px 转换比
+    let bottomSafeHeight = 0;
+    let tabBarOuterHeight = 58;
+
+    if (safeArea) {
+      bottomSafeHeight = windowHeight - safeArea.bottom;
+      tabBarOuterHeight = 50 + bottomSafeHeight;
+    }
+
     this.setData({
       statusBarHeight: statusBarHeight,
       navHeight: statusBarHeight + navContentHeight,
-      fixedTopHeight: 370 // 估算值（含推荐服务标题），onReady中动态测量精确值
+      fixedTopHeight: 370,
+      bottomSafeHeight: bottomSafeHeight,
+      tabBarOuterHeight: tabBarOuterHeight,
+      rpxToPx: rpxToPx,
+      fabBottom: tabBarOuterHeight + 10 + 30 * rpxToPx   // iOS/安卓自适应：tab高度 + 10px间距 + 往上30rpx
     });
   },
 
   onReady() {
-    // 动态测量固定区域的实际高度，确保服务卡片不被挡住
-    // 延迟测量，确保分类数据渲染完成
+    const self = this;
     setTimeout(() => {
       const query = wx.createSelectorQuery();
       query.select('.fixed-top').boundingClientRect((rect) => {
         if (rect) {
-          this.setData({
-            fixedTopHeight: rect.height
+          const systemInfo = wx.getSystemInfoSync();
+          const windowHeight = systemInfo.windowHeight;
+          const tabBarOuterHeight = self.data.tabBarOuterHeight;
+          const rpxToPx = self.data.rpxToPx;
+          const buttonHeight = 50;
+          const margin = 10 + 30 * rpxToPx;  // 最下方边界上调 30rpx
+
+          const fabMinBottom = tabBarOuterHeight + margin;
+          const fabMaxBottom = windowHeight - rect.height - buttonHeight - margin;
+
+          self.setData({
+            fixedTopHeight: rect.height,
+            fabMinBottom: Math.max(fabMinBottom, 0),
+            fabMaxBottom: Math.max(fabMaxBottom, fabMinBottom + buttonHeight),
+            fabBottom: Math.min(self.data.fabBottom, Math.max(fabMaxBottom, fabMinBottom))
           });
         }
       }).exec();
     }, 300);
+  },
+
+  // ========== 悬浮按钮拖动 ==========
+  onFabTouchStart(e) {
+    const touch = e.touches[0];
+    this.setData({
+      isDragging: true,
+      touchStartY: touch.clientY,
+      startBottom: this.data.fabBottom
+    });
+  },
+
+  onFabTouchMove(e) {
+    if (!this.data.isDragging) return;
+    const touch = e.touches[0];
+    const deltaY = this.data.touchStartY - touch.clientY;
+    let newBottom = this.data.startBottom + deltaY;
+    newBottom = Math.max(this.data.fabMinBottom, Math.min(newBottom, this.data.fabMaxBottom));
+    this.setData({ fabBottom: newBottom });
+  },
+
+  onFabTouchEnd(e) {
+    const startY = this.data.touchStartY;
+    this.setData({ isDragging: false });
+    // 移动距离很小则触发点击
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      const endY = e.changedTouches[0].clientY;
+      if (Math.abs(startY - endY) < 5) {
+        this.publishService();
+      }
+    }
   },
 
   // 切换标签（我的需求）

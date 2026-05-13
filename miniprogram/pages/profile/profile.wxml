@@ -47,7 +47,7 @@
   scroll-y
   enhanced
   show-scrollbar="{{false}}"
-  style="height: calc(100vh - {{fixedTopHeight}}px - 58px);"
+  style="height: calc(100vh - {{fixedTopHeight}}px - {{tabBarOuterHeight}}px);"
 >
   <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
   <view class="menu-section">
@@ -150,5 +150,5 @@
   </view>
 
   <!-- 底部安全距离 -->
-  <view class="safe-bottom"></view>
+  <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 8 : 8}}px;"></view>
 </scroll-view>

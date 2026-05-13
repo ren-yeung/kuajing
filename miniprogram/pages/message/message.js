@@ -2,6 +2,8 @@ Page({
   data: {
     statusBarHeight: 0,
     fixedTopHeight: 0,
+    bottomSafeHeight: 0,
+    tabBarOuterHeight: 58,
     messages: [
       {
         id: 1,
@@ -98,9 +100,22 @@ Page({
 
   onLoad() {
     var systemInfo = wx.getSystemInfoSync();
+    var statusBarHeight = systemInfo.statusBarHeight;
+    var windowHeight = systemInfo.windowHeight;
+    var safeArea = systemInfo.safeArea;
+    var bottomSafeHeight = 0;
+    var tabBarOuterHeight = 58;
+
+    if (safeArea) {
+      bottomSafeHeight = windowHeight - safeArea.bottom;
+      tabBarOuterHeight = 50 + bottomSafeHeight;
+    }
+
     this.setData({
-      statusBarHeight: systemInfo.statusBarHeight,
-      fixedTopHeight: 200
+      statusBarHeight: statusBarHeight,
+      fixedTopHeight: 200,
+      bottomSafeHeight: bottomSafeHeight,
+      tabBarOuterHeight: tabBarOuterHeight
     });
   },
 
