@@ -1,0 +1,79 @@
+<!-- 整个固定区域：导航栏 + 搜索 + 分类导航 + 推荐服务标题 -->
+<view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 导航栏 -->
+  <view class="nav-content">
+    <text class="nav-title">服务广场</text>
+  </view>
+  <!-- 搜索栏 -->
+  <view class="search-section" bindtap="goSearch">
+    <view class="search-bar">
+      <image src="/images/search.png" class="search-icon"></image>
+      <text class="search-placeholder">搜索服务、商家</text>
+    </view>
+  </view>
+  <!-- 分类导航 -->
+  <view class="category-section">
+    <view class="category-list">
+      <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="selectCategory" data-id="{{item.id}}">
+        <view class="category-icon" style="background: {{item.bgColor}};">
+          <text>{{item.icon}}</text>
+        </view>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+  <!-- 推荐服务标题 -->
+  <view class="section-header">
+    <text class="section-title">推荐服务</text>
+    <text class="section-tab" bindtap="switchTab" data-tab="my">我的需求</text>
+    <text class="section-more" bindtap="viewMore">查看更多 ></text>
+  </view>
+</view>
+
+<!-- 占位：顶出固定区域高度 -->
+<view style="height: {{fixedTopHeight}}px;"></view>
+
+<!-- 可滚动区域：服务卡片 -->
+<scroll-view 
+  class="service-scroll" 
+  scroll-y 
+  enhanced 
+  show-scrollbar="{{false}}"
+  style="height: calc(100vh - {{fixedTopHeight}}px - 58px);"
+>
+  <!-- 顶部间距占位（随内容滚动，不遮挡卡片） -->
+  <view style="height: 16px;"></view>
+
+  <!-- 服务卡片 -->
+  <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
+    <view class="card-inner">
+      <view class="service-image" style="background: {{item.gradient}};">
+        <text>服务图片</text>
+      </view>
+      <view class="service-info">
+        <text class="service-title">{{item.title}}</text>
+        <view class="service-provider">
+          <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+          <text class="provider-name">{{item.provider}}</text>
+          <text class="provider-rating">⭐ {{item.rating}}</text>
+        </view>
+        <text class="service-desc">{{item.desc}}</text>
+        <view class="service-stats">
+          <view class="stats-left">
+            <text class="stat-item">❤️ {{item.likes}}</text>
+            <text class="stat-item">👁️ {{item.views}}</text>
+          </view>
+          <view class="contact-btn" catchtap="contactService" data-id="{{item.id}}">立即咨询</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全距离 -->
+  <view class="safe-bottom"></view>
+</scroll-view>
+
+<!-- 悬浮发布按钮 -->
+<view class="fab-button" bindtap="publishService">
+  <image src="/images/plus-white.png" class="fab-icon"></image>
+</view>

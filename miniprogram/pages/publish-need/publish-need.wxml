@@ -1,0 +1,108 @@
+<!-- 导航栏（固定定位） -->
+<view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+  <view class="nav-content">
+    <view class="nav-back" bindtap="goBack">
+      <text class="back-arrow">‹</text>
+      <text class="back-text">返回</text>
+    </view>
+    <text class="nav-title">发布需求</text>
+    <view class="nav-right-placeholder"></view>
+  </view>
+</view>
+
+<!-- 占位：顶出导航栏高度 -->
+<view style="height: {{navHeight}}px;"></view>
+
+<!-- 可滚动区域：表单 -->
+<scroll-view
+  class="form-scroll"
+  scroll-y
+  enhanced
+  show-scrollbar="{{false}}"
+  style="height: {{scrollViewHeight}}px;"
+>
+  <!-- 需求标题 -->
+  <view class="form-group">
+    <text class="form-label required">需求标题</text>
+    <input
+      class="form-input"
+      placeholder="请输入需求标题，例如：寻找美国海外仓服务"
+      value="{{form.title}}"
+      bindinput="onInput"
+      data-field="title"
+    />
+  </view>
+
+  <!-- 需求分类 -->
+  <view class="form-group">
+    <text class="form-label required">需求分类</text>
+    <view class="category-grid">
+      <view
+        class="category-option {{selectedCategory === item ? 'selected' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="*this"
+        bindtap="selectCategory"
+        data-category="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 需求描述 -->
+  <view class="form-group">
+    <text class="form-label required">需求描述</text>
+    <textarea
+      class="form-textarea"
+      placeholder="请详细描述您的需求，包括具体要求、预期效果等"
+      value="{{form.description}}"
+      bindinput="onInput"
+      data-field="description"
+    />
+  </view>
+
+  <!-- 联系电话 -->
+  <view class="form-group">
+    <text class="form-label required">联系电话</text>
+    <input
+      class="form-input"
+      type="number"
+      placeholder="请输入联系电话"
+      value="{{form.phone}}"
+      bindinput="onInput"
+      data-field="phone"
+    />
+  </view>
+
+  <!-- 需求地区 -->
+  <view class="form-group">
+    <text class="form-label required">需求地区</text>
+    <input
+      class="form-input"
+      placeholder="请输入需求地区，例如：美国、欧洲"
+      value="{{form.region}}"
+      bindinput="onInput"
+      data-field="region"
+    />
+  </view>
+
+  <!-- 补充说明 -->
+  <view class="form-group">
+    <text class="form-label">补充说明</text>
+    <textarea
+      class="form-textarea"
+      placeholder="如有其他需要说明的内容，请在此补充（选填）"
+      value="{{form.remark}}"
+      bindinput="onInput"
+      data-field="remark"
+    />
+  </view>
+
+  <!-- 底部留白（避免最后一项被固定按钮遮挡） -->
+  <view style="height: 90px;"></view>
+</scroll-view>
+
+<!-- 底部固定：提交按钮 -->
+<view class="submit-bar">
+  <button class="submit-btn" bindtap="submitForm">发布需求</button>
+</view>

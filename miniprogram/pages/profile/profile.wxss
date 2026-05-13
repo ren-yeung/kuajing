@@ -1,0 +1,220 @@
+/* 页面整体 */
+page {
+  background: #f5f5f5;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ========== 固定区域：个人资料 + 统计 ========== */
+.fixed-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 100;
+}
+
+/* 导航栏（在固定区域内，与首页、消息页一致） */
+.nav-content {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* 个人资料内部 */
+.profile-inner {
+  padding: 20px 16px 16px;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.profile-mood {
+  font-size: 12px;
+  color: #999;
+  display: block;
+}
+
+.profile-log {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  background: #f9f9f9;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+.log-date {
+  color: #999;
+  font-size: 11px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.log-text {
+  color: #333;
+  display: block;
+}
+
+/* 统计数据 */
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 0 8px;
+  background: white;
+  border-top: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+
+.stat-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rpx;
+  height: 24px;
+  background: #e0e0e0;
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ========== 可滚动区域：菜单列表 ========== */
+.menu-scroll {
+  background: white;
+}
+
+.menu-section {
+  background: white;
+}
+
+.menu-section-gap {
+  height: 1rpx;
+  background: #e0e0e0;
+}
+
+.menu-list {
+  padding: 0 16px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.menu-label {
+  font-size: 15px;
+  color: #000;
+}
+
+.menu-count {
+  font-size: 14px;
+  color: #999;
+  margin-left: 8px;
+}
+
+.menu-arrow {
+  color: #999;
+  font-size: 14px;
+}
+
+.menu-badge {
+  background: #ff3b30;
+  color: white;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+/* 底部安全距离（不被tab遮挡） */
+.safe-bottom {
+  height: 50px;
+}

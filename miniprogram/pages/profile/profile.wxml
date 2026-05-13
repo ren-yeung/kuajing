@@ -1,0 +1,154 @@
+<!-- 固定区域：个人资料 + 统计 -->
+<view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 导航栏（在固定区域内） -->
+  <view class="nav-content">
+    <text class="nav-title">个人主页</text>
+  </view>
+
+  <view class="profile-inner">
+    <view class="profile-header">
+      <view class="profile-avatar">
+        <text>我</text>
+      </view>
+      <view class="profile-info">
+        <text class="profile-name">跨境电商小陈</text>
+        <text class="profile-mood">我要赚大钱！！！</text>
+      </view>
+    </view>
+
+    <view class="profile-log">
+      <view class="log-date">今天 14:30</view>
+      <view class="log-text">发布了新需求："寻找美国海外仓合作商"</view>
+    </view>
+  </view>
+
+  <view class="profile-stats">
+    <view class="stat-item">
+      <text class="stat-number">12</text>
+      <text class="stat-label">发布需求</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">8</text>
+      <text class="stat-label">咨询商家</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">5</text>
+      <text class="stat-label">成功合作</text>
+    </view>
+  </view>
+</view>
+
+<!-- 占位：顶出固定区域高度 -->
+<view style="height: {{fixedTopHeight}}px;"></view>
+
+<!-- 可滚动区域：菜单列表 -->
+<scroll-view
+  class="menu-scroll"
+  scroll-y
+  enhanced
+  show-scrollbar="{{false}}"
+  style="height: calc(100vh - {{fixedTopHeight}}px - 58px);"
+>
+  <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
+  <view class="menu-section">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goPage" data-page="myPosts">
+        <view class="menu-left">
+          <view class="menu-icon">📝</view>
+          <text class="menu-label">我的发布</text>
+          <text class="menu-count">12篇</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="myLikes">
+        <view class="menu-left">
+          <view class="menu-icon">❤️</view>
+          <text class="menu-label">我的点赞</text>
+          <text class="menu-count">28篇</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="myFavorites">
+        <view class="menu-left">
+          <view class="menu-icon">⭐</view>
+          <text class="menu-label">我的收藏</text>
+          <text class="menu-count">15篇</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="history">
+        <view class="menu-left">
+          <view class="menu-icon">📱</view>
+          <text class="menu-label">浏览历史</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 灰色线条分隔 -->
+  <view class="menu-section-gap"></view>
+
+  <!-- 第二组：我的消息、系统通知 -->
+  <view class="menu-section">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goPage" data-page="myMessages">
+        <view class="menu-left">
+          <view class="menu-icon">💬</view>
+          <text class="menu-label">我的消息</text>
+        </view>
+        <view style="display: flex; align-items: center; gap: 8px;">
+          <view class="menu-badge">5</view>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="notifications">
+        <view class="menu-left">
+          <view class="menu-icon">🔔</view>
+          <text class="menu-label">系统通知</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 灰色线条分隔 -->
+  <view class="menu-section-gap"></view>
+
+  <!-- 第三组：编辑资料、隐私设置、帮助与反馈、成为商家 -->
+  <view class="menu-section">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goPage" data-page="editProfile">
+        <view class="menu-left">
+          <view class="menu-icon">👤</view>
+          <text class="menu-label">编辑资料</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="privacy">
+        <view class="menu-left">
+          <view class="menu-icon">🔒</view>
+          <text class="menu-label">隐私设置</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="help">
+        <view class="menu-left">
+          <view class="menu-icon">❓</view>
+          <text class="menu-label">帮助与反馈</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPage" data-page="becomeMerchant">
+        <view class="menu-left">
+          <view class="menu-icon">🏪</view>
+          <text class="menu-label">成为商家</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全距离 -->
+  <view class="safe-bottom"></view>
+</scroll-view>

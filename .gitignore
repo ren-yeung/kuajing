@@ -1,0 +1,25 @@
+# 小程序
+miniprogram_npm/
+node_modules/
+
+# 云函数
+cloudfunctions/node_modules/
+
+# 编译产物
+project.config.json.backup
+project.private.config.json
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+npm-debug.log*
+
+# WorkBuddy
+.workbuddy/

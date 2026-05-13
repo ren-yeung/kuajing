@@ -1,0 +1,61 @@
+<view class="fixed-top" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 导航栏（在固定区域内） -->
+  <view class="nav-content">
+    <text class="nav-title">消息</text>
+  </view>
+
+  <!-- 置顶系统通知 -->
+  <view class="pinned-notification">
+    <view class="pinned-icon">
+      <text class="pinned-bell">🔔</text>
+    </view>
+    <view class="pinned-content">
+      <text class="pinned-title">📌 系统通知</text>
+      <text class="pinned-text">欢迎使用跨境服务圈！点击查看最新活动和优惠信息...</text>
+    </view>
+    <view class="pinned-badge">NEW</view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索聊天记录</text>
+    </view>
+  </view>
+</view>
+
+<!-- 占位：顶出固定区域高度 -->
+<view style="height: {{fixedTopHeight}}px;"></view>
+
+<!-- 可滚动区域：消息列表 -->
+<scroll-view
+  class="message-scroll"
+  scroll-y
+  enhanced
+  show-scrollbar="{{false}}"
+  style="height: calc(100vh - {{fixedTopHeight}}px - 58px);"
+>
+  <view
+    class="message-item"
+    wx:for="{{messages}}"
+    wx:key="id"
+    bindtap="goChat"
+    data-id="{{item.id}}"
+  >
+    <view class="message-avatar" style="background: {{item.avatarBg}};">
+      <text>{{item.avatarText}}</text>
+    </view>
+    <view class="message-content">
+      <view class="message-header">
+        <text class="message-name">{{item.name}}</text>
+        <text class="message-time">{{item.time}}</text>
+      </view>
+      <text class="message-preview">{{item.preview}}</text>
+    </view>
+    <view class="unread-badge" wx:if="{{item.unread > 0}}">{{item.unread}}</view>
+  </view>
+
+  <!-- 底部安全距离 -->
+  <view class="safe-bottom"></view>
+</scroll-view>
