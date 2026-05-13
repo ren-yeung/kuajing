@@ -1,0 +1,113 @@
+<!--service-detail.wxml-->
+<view class="page">
+  <!-- 导航栏（绝对定位，覆盖在图片上） -->
+  <view class="nav-bar">
+    <view class="nav-content">
+      <view class="nav-back" bindtap="goBack">‹</view>
+    </view>
+  </view>
+
+  <!-- 服务图片 -->
+  <view class="service-image" style="background: {{service.gradient}};">
+    <text>服务封面图片</text>
+  </view>
+
+  <!-- 可滚动内容 -->
+  <scroll-view class="content-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- 服务信息卡片 -->
+    <view class="service-info-card">
+      <view class="service-header">
+        <view class="service-price">
+          ¥{{service.price}}<text class="price-unit">{{service.priceUnit}}</text>
+        </view>
+        <view class="service-actions">
+          <view class="action-item" bindtap="toggleLike">
+            <text>{{isLiked ? '❤️' : '🤍'}}</text>
+          </view>
+          <view class="action-item" bindtap="shareService">🔗</view>
+          <view class="action-item" bindtap="collectService">
+            <text>{{isCollected ? '❤️' : '🔖'}}</text>
+          </view>
+        </view>
+      </view>
+      <text class="service-title">{{service.title}}</text>
+      <view class="service-stats">
+        <text class="stat-item">❤️ {{likeCount}}</text>
+        <text class="stat-item">👁️ {{service.views}}</text>
+        <text class="stat-item">已售 {{service.sold}}</text>
+      </view>
+    </view>
+
+    <!-- 商家信息 -->
+    <view class="merchant-section">
+      <view class="merchant-avatar" style="background: {{service.provider.avatarBg}}; color: {{service.provider.avatarColor}};">
+        {{service.provider.avatarText}}
+      </view>
+      <view class="merchant-info">
+        <view class="merchant-name">
+          {{service.provider.name}}
+          <text class="verified-badge">已认证</text>
+        </view>
+        <text class="merchant-rating">⭐ {{service.provider.rating}} | 粉丝 {{service.provider.fans}}</text>
+      </view>
+      <view class="follow-btn {{isFollowing ? 'following' : 'not-following'}}" bindtap="toggleFollow">
+        {{isFollowing ? '已关注' : '关注'}}
+      </view>
+    </view>
+
+    <!-- 服务详情 -->
+    <view class="detail-section">
+      <text class="section-title">服务详情</text>
+      <view class="detail-text">
+        <text>{{service.desc}}</text>
+        <view style="height: 24rpx;"></view>
+        <text style="font-weight: 600;">服务优势：</text>
+        <view style="height: 12rpx;"></view>
+        <block wx:for="{{service.advantages}}" wx:key="index">
+          <text>{{index + 1}}. {{item}}</text>
+        </block>
+        <view style="height: 24rpx;"></view>
+        <text style="font-weight: 600;">适用范围：</text>
+        <text>{{service.scope}}</text>
+      </view>
+      <view class="detail-tags">
+        <text class="detail-tag" wx:for="{{service.tags}}" wx:key="index">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 评价区 -->
+    <view class="review-section">
+      <view class="review-header">
+        <text class="section-title">评价 ({{service.reviews.length}})</text>
+        <text class="review-more">查看全部 ></text>
+      </view>
+      <view class="review-item" wx:for="{{service.reviews}}" wx:key="index">
+        <view class="review-avatar">{{item.avatar}}</view>
+        <view class="review-content">
+          <text class="review-name">{{item.name}}</text>
+          <text class="review-rating">{{item.rating}}</text>
+          <text class="review-text">{{item.text}}</text>
+          <text class="review-date">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部安全距离 -->
+    <view style="height: 180rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bottom-left">
+      <view class="bottom-action" bindtap="callMerchant">
+        <text class="bottom-action-icon">📞</text>
+        <text class="bottom-action-text">电话</text>
+      </view>
+      <view class="bottom-action" bindtap="chatMerchant">
+        <text class="bottom-action-icon">💬</text>
+        <text class="bottom-action-text">聊天</text>
+      </view>
+    </view>
+    <view class="contact-btn" bindtap="contactMerchant">立即咨询</view>
+  </view>
+</view>

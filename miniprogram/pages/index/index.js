@@ -1,3 +1,5 @@
+const login = require('../../utils/login.js');
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -134,8 +136,17 @@ Page({
   },
 
   onReady() {
+    this.calcFixedTopHeight();
+  },
+
+  onShow() {
+    this.calcFixedTopHeight();
+  },
+
+  // 计算固定区域高度 + 悬浮按钮边界
+  calcFixedTopHeight() {
     const self = this;
-    setTimeout(() => {
+    wx.nextTick(() => {
       const query = wx.createSelectorQuery();
       query.select('.fixed-top').boundingClientRect((rect) => {
         if (rect) {
@@ -144,7 +155,7 @@ Page({
           const tabBarOuterHeight = self.data.tabBarOuterHeight;
           const rpxToPx = self.data.rpxToPx;
           const buttonHeight = 50;
-          const margin = 10 + 30 * rpxToPx;  // 最下方边界上调 30rpx
+          const margin = 10 + 30 * rpxToPx;
 
           const fabMinBottom = tabBarOuterHeight + margin;
           const fabMaxBottom = windowHeight - rect.height - buttonHeight - margin;
@@ -157,7 +168,7 @@ Page({
           });
         }
       }).exec();
-    }, 300);
+    });
   },
 
   // ========== 悬浮按钮拖动 ==========
@@ -214,8 +225,12 @@ Page({
     });
   },
 
-  // 跳转服务详情
+  // 跳转服务详情（需要登录）
   goServiceDetail(e) {
+    if (!login.checkLogin()) {
+      login.requireLogin().catch(() => {});
+      return;
+    }
     const serviceId = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/service-detail/service-detail?id=${serviceId}`
@@ -224,6 +239,10 @@ Page({
 
   // 联系服务
   contactService(e) {
+    if (!login.checkLogin()) {
+      login.requireLogin().catch(() => {});
+      return;
+    }
     const serviceId = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/chat/chat?serviceId=${serviceId}`
@@ -232,6 +251,10 @@ Page({
 
   // 发布服务/需求
   publishService() {
+    if (!login.checkLogin()) {
+      login.requireLogin().catch(() => {});
+      return;
+    }
     wx.showActionSheet({
       itemList: ['发布服务', '发布需求'],
       success(res) {

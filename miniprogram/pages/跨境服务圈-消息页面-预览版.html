@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 消息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏（与首页完全一致） */
+        .nav-bar {
+            background: white;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 0.5px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        /* 固定区域：系统通知 + 搜索栏 */
+        .fixed-top {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        /* 置顶系统通知 */
+        .pinned-notification {
+            background: #f0f9ff;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pinned-icon {
+            width: 36px;
+            height: 36px;
+            background: #07C160;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pinned-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pinned-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 2px;
+        }
+
+        .pinned-text {
+            font-size: 12px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pinned-badge {
+            background: #ff3b30;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        /* 搜索栏（在固定区域内，系统通知下方） */
+        .search-section {
+            padding: 8px 16px 12px;
+            background: white;
+            border-bottom: 0.5px solid #f0f0f0;
+        }
+
+        .search-bar {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .search-placeholder {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* 占位：顶出固定区域高度 */
+        .fixed-placeholder {
+            flex-shrink: 0;
+        }
+
+        /* 可滚动区域：消息列表 */
+        .message-list {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .message-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 消息列表项 */
+        .message-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: white;
+            border-bottom: 0.5px solid #f0f0f0;
+            gap: 14px;
+        }
+
+        .message-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .message-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .message-preview {
+            font-size: 13px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .unread-badge {
+            background: #07C160;
+            color: white;
+            font-size: 11px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            flex-shrink: 0;
+        }
+
+        /* 底部安全距离 */
+        .safe-bottom {
+            height: 80px;
+        }
+
+        /* 底部导航 */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-label.active {
+            color: #07C160;
+        }
+
+        .tab-label.inactive {
+            color: #999;
+        }
+
+        .notification-dot {
+            position: relative;
+        }
+
+        .dot {
+            position: absolute;
+            top: -2px;
+            right: -6px;
+            width: 8px;
+            height: 8px;
+            background: #ff3b30;
+            border-radius: 50%;
+            border: 1.5px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 导航栏（与首页一致） -->
+        <div class="nav-bar">消息</div>
+
+        <!-- 固定区域：系统通知 + 搜索栏 -->
+        <div class="fixed-top">
+            <!-- 置顶系统通知 -->
+            <div class="pinned-notification">
+                <div class="pinned-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </div>
+                <div class="pinned-content">
+                    <div class="pinned-title">📌 系统通知</div>
+                    <div class="pinned-text">欢迎使用跨境服务圈！点击查看最新活动和优惠信息...</div>
+                </div>
+                <div class="pinned-badge">NEW</div>
+            </div>
+
+            <!-- 搜索栏（在固定区域内） -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <span class="search-placeholder">搜索聊天记录</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 占位：顶出固定区域高度 -->
+        <div class="fixed-placeholder"></div>
+
+        <!-- 可滚动区域：消息列表 -->
+        <div class="message-list">
+            <!-- 消息1：未读 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">张三物流</span>
+                        <span class="message-time">上午 10:30</span>
+                    </div>
+                    <div class="message-preview">您好，美国专线的价格已经发给您了...</div>
+                </div>
+                <div class="unread-badge">3</div>
+            </div>
+
+            <!-- 消息2：未读 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    李
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">李四支付</span>
+                        <span class="message-time">昨天</span>
+                    </div>
+                    <div class="message-preview">跨境支付结汇的费率可以再优惠...</div>
+                </div>
+                <div class="unread-badge">1</div>
+            </div>
+
+            <!-- 消息3 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    王
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">王五认证</span>
+                        <span class="message-time">周一</span>
+                    </div>
+                    <div class="message-preview">欧盟CE认证的资料已经收到，正在...</div>
+                </div>
+            </div>
+
+            <!-- 消息4 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    赵
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">赵六仓储</span>
+                        <span class="message-time">上周</span>
+                    </div>
+                    <div class="message-preview">海外仓的租金下个月会调整...</div>
+                </div>
+            </div>
+
+            <!-- 消息5 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    孙
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">孙七营销</span>
+                        <span class="message-time">上周</span>
+                    </div>
+                    <div class="message-preview">TikTok广告投放的方案已经做好了...</div>
+                </div>
+            </div>
+
+            <!-- 消息6 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+                    周
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">周八培训</span>
+                        <span class="message-time">上周</span>
+                    </div>
+                    <div class="message-preview">跨境电商培训的下期课程安排...</div>
+                </div>
+            </div>
+
+            <!-- 消息7：未读 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    吴
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">吴九法务</span>
+                        <span class="message-time">上上周</span>
+                    </div>
+                    <div class="message-preview">您的商标注册申请已经提交...</div>
+                </div>
+                <div class="unread-badge">2</div>
+            </div>
+
+            <!-- 消息8 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                    郑
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">郑十税务</span>
+                        <span class="message-time">3天前</span>
+                    </div>
+                    <div class="message-preview">跨境税务筹划方案已经发送...</div>
+                </div>
+            </div>
+
+            <!-- 消息9：未读 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
+                    褚
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">褚十三设计</span>
+                        <span class="message-time">6天前</span>
+                    </div>
+                    <div class="message-preview">品牌LOGO和包装设计初稿已出...</div>
+                </div>
+                <div class="unread-badge">1</div>
+            </div>
+
+            <!-- 消息10 -->
+            <div class="message-item">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    蒋
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">蒋十五IT服务</span>
+                        <span class="message-time">一周前</span>
+                    </div>
+                    <div class="message-preview">跨境电商ERP系统对接完成...</div>
+                </div>
+            </div>
+
+            <!-- 底部安全距离 -->
+            <div class="safe-bottom"></div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label inactive">首页</span>
+            </div>
+            <div class="tab-item notification-dot">
+                <div class="dot"></div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#07C160" stroke="#07C160" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label active">消息</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label inactive">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var fixedTop = document.querySelector('.fixed-top');
+            var placeholder = document.querySelector('.fixed-placeholder');
+            if (fixedTop && placeholder) {
+                placeholder.style.height = fixedTop.offsetHeight + 'px';
+            }
+        });
+    </script>
+</body>
+</html>

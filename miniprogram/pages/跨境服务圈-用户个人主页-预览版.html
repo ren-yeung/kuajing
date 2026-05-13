@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏（与首页、消息页完全一致） */
+        .nav-bar {
+            background: white;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 0.5px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        /* 固定区域：个人资料 */
+        .fixed-top {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 10;
+            border-top: 0.5px solid #e0e0e0;
+        }
+
+        .profile-inner {
+            padding: 20px 16px 16px;
+            border-bottom: 0.5px solid #f0f0f0;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 6px;
+        }
+
+        .profile-mood {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .profile-log {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+            background: #f9f9f9;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+
+        .log-date {
+            color: #999;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .log-text {
+            color: #333;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0 8px;
+            background: white;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            position: relative;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.5px;
+            height: 24px;
+            background: #e0e0e0;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 占位：顶出固定区域高度 */
+        .fixed-placeholder {
+            flex-shrink: 0;
+        }
+
+        /* 可滚动区域：菜单列表 */
+        .menu-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: white;
+        }
+
+        .menu-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .menu-section {
+            background: white;
+        }
+
+        .menu-section-gap {
+            height: 0.5px;
+            background: #e0e0e0;
+        }
+
+        .menu-list {
+            padding: 0 16px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 0.5px solid #f0f0f0;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: #f5f5f5;
+        }
+
+        .menu-label {
+            font-size: 15px;
+            color: #000;
+        }
+
+        .menu-count {
+            font-size: 14px;
+            color: #999;
+            margin-left: 8px;
+        }
+
+        .menu-arrow {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .menu-badge {
+            background: #ff3b30;
+            color: white;
+            font-size: 11px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+
+        /* 底部安全距离 */
+        .safe-bottom {
+            height: 10px;
+        }
+
+        /* 底部导航 */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-label.active {
+            color: #07C160;
+        }
+
+        .tab-label.inactive {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 导航栏（与首页、消息页一致） -->
+        <div class="nav-bar">个人主页</div>
+
+        <!-- 固定区域：个人资料 -->
+        <div class="fixed-top">
+            <div class="profile-inner">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        我
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">跨境电商小陈</div>
+                        <div class="profile-mood">我要赚大钱！！！</div>
+                    </div>
+                </div>
+
+                <div class="profile-log">
+                    <div class="log-date">今天 14:30</div>
+                    <div class="log-text">发布了新需求："寻找美国海外仓合作商"</div>
+                </div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-number">12</span>
+                    <span class="stat-label">发布需求</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">8</span>
+                    <span class="stat-label">咨询商家</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">成功合作</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 占位：顶出固定区域高度 -->
+        <div class="fixed-placeholder"></div>
+
+        <!-- 可滚动区域：菜单列表 -->
+        <div class="menu-scroll">
+            <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
+            <div class="menu-section">
+                <div class="menu-list">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">📝</div>
+                            <span class="menu-label">我的发布</span>
+                            <span class="menu-count">12篇</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">❤️</div>
+                            <span class="menu-label">我的点赞</span>
+                            <span class="menu-count">28篇</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">⭐</div>
+                            <span class="menu-label">我的收藏</span>
+                            <span class="menu-count">15篇</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">📱</div>
+                            <span class="menu-label">浏览历史</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 灰色线条分隔 -->
+            <div class="menu-section-gap"></div>
+
+            <!-- 第二组：我的消息、系统通知 -->
+            <div class="menu-section">
+                <div class="menu-list">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">💬</div>
+                            <span class="menu-label">我的消息</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="menu-badge">5</div>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">🔔</div>
+                            <span class="menu-label">系统通知</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 灰色线条分隔 -->
+            <div class="menu-section-gap"></div>
+
+            <!-- 第三组：编辑资料、隐私设置、帮助与反馈、成为商家 -->
+            <div class="menu-section">
+                <div class="menu-list">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">👤</div>
+                            <span class="menu-label">编辑资料</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">🔒</div>
+                            <span class="menu-label">隐私设置</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">❓</div>
+                            <span class="menu-label">帮助与反馈</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon">🏪</div>
+                            <span class="menu-label">成为商家</span>
+                        </div>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部安全距离 -->
+            <div class="safe-bottom"></div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label inactive">首页</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label inactive">消息</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#07C160" stroke="#07C160" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label active">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var fixedTop = document.querySelector('.fixed-top');
+            var placeholder = document.querySelector('.fixed-placeholder');
+            if (fixedTop && placeholder) {
+                placeholder.style.height = fixedTop.offsetHeight + 'px';
+            }
+        });
+    </script>
+</body>
+</html>

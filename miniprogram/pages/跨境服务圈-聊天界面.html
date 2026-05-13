@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 聊天</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* 微信状态栏 */
+        .wx-status-bar {
+            background: white;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: 600;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        /* 导航栏 */
+        .nav-bar {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 32px;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            border-bottom: 0.5px solid #f0f0f0;
+            height: 50px;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            flex: 1;
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* 微信原生胶囊按钮 */
+        .wx-capsule {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            border: 0.5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 5px 12px;
+            gap: 8px;
+        }
+
+        .wx-capsule-divider {
+            width: 0.5px;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* 聊天区域 */
+        .chat-container {
+            position: absolute;
+            top: 82px;
+            bottom: 116px;
+            left: 0;
+            right: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
+            background: #f5f5f5;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 时间分隔符 */
+        .time-divider {
+            text-align: center;
+            margin: 16px 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 消息气泡 */
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .message.received {
+            flex-direction: row;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.received .message-avatar {
+            margin-right: 12px;
+        }
+
+        .message.sent .message-avatar {
+            margin-left: 12px;
+            background: #07C160;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.received .message-bubble {
+            background: white;
+            color: #000;
+            border-top-left-radius: 4px;
+        }
+
+        .message.sent .message-bubble {
+            background: #95EC69;
+            color: #000;
+            border-top-right-radius: 4px;
+        }
+
+        /* 请求联系方式消息样式 */
+        .contact-request {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .contact-request-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .contact-request-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-agree {
+            flex: 1;
+            background: #07C160;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-reject {
+            flex: 1;
+            background: white;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* 底部输入栏 */
+        .input-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: absolute;
+            bottom: 58px;
+            left: 0;
+            right: 0;
+            height: 58px;
+            z-index: 100;
+        }
+
+        .input-field {
+            flex: 1;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 15px;
+            outline: none;
+            height: 36px;
+        }
+
+        .btn-send {
+            background: #07C160;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            height: 36px;
+            white-space: nowrap;
+        }
+
+        /* 底部导航 */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 58px;
+            z-index: 101;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding-top: 8px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-active {
+            color: #07C160;
+        }
+
+        .tab-inactive {
+            color: #999;
+        }
+
+        .notification-dot {
+            position: relative;
+        }
+
+        .dot {
+            position: absolute;
+            top: 6px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: #ff3b30;
+            border-radius: 50%;
+            border: 1.5px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 微信状态栏 -->
+        <div class="wx-status-bar">
+            <span>9:41</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- 导航栏 -->
+        <div class="nav-bar">
+            <div class="nav-back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </div>
+            <h1 class="nav-title">张三物流</h1>
+            <div class="wx-capsule">
+                <!-- 三个点 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+                    <circle cx="6" cy="12" r="1.5" fill="#000" stroke="none"/>
+                    <circle cx="12" cy="12" r="1.5" fill="#000" stroke="none"/>
+                    <circle cx="18" cy="12" r="1.5" fill="#000" stroke="none"/>
+                </svg>
+                <div class="wx-capsule-divider"></div>
+                <!-- 搜索图标 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 聊天区域 -->
+        <div class="chat-container">
+            <div class="time-divider">上午 10:15</div>
+
+            <!-- 对方消息1 -->
+            <div class="message received">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-bubble">
+                    您好！请问需要什么跨境物流服务？
+                </div>
+            </div>
+
+            <!-- 自己消息1 -->
+            <div class="message sent">
+                <div class="message-avatar">
+                    我
+                </div>
+                <div class="message-bubble">
+                    你好，我想咨询一下美国专线的价格
+                </div>
+            </div>
+
+            <!-- 对方消息2 -->
+            <div class="message received">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-bubble">
+                    好的，美国专线小包的价格根据重量和时效不同。请问您大概什么产品？重量多少？
+                </div>
+            </div>
+
+            <!-- 自己消息2 -->
+            <div class="message sent">
+                <div class="message-avatar">
+                    我
+                </div>
+                <div class="message-bubble">
+                    是电子产品，大概200克
+                </div>
+            </div>
+
+            <!-- 对方消息3 -->
+            <div class="message received">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-bubble">
+                    200克的话，美国专线小包大概15-18元/件，时效7-12个工作日。需要给您发详细的报价表吗？
+                </div>
+            </div>
+
+            <!-- 自己消息3 -->
+            <div class="message sent">
+                <div class="message-avatar">
+                    我
+                </div>
+                <div class="message-bubble">
+                    好的，请发一下。另外可以走敏感货吗？
+                </div>
+            </div>
+
+            <!-- 对方消息4 - 请求联系方式 -->
+            <div class="message received">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-bubble">
+                    可以走敏感货，但需要单独确认。
+                    <div class="contact-request">
+                        <div class="contact-request-text">📱 商家请求提供联系方式，方便详细沟通</div>
+                        <div class="contact-request-actions">
+                            <button class="btn-reject">拒绝</button>
+                            <button class="btn-agree">同意</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-divider">上午 10:30</div>
+
+            <!-- 对方消息5 -->
+            <div class="message received">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    张
+                </div>
+                <div class="message-bubble">
+                    报价表已发送，请查收！
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部输入栏 -->
+        <div class="input-bar">
+            <input type="text" class="input-field" placeholder="输入消息...">
+            <button class="btn-send">发送</button>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label tab-inactive">首页</span>
+            </div>
+            <div class="tab-item notification-dot">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label tab-inactive">消息</span>
+                <div class="dot"></div>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label tab-inactive">我的</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

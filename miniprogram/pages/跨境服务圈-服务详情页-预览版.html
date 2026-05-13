@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 服务详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* ========== 滚动内容区域 ========== */
+        .content-scroll {
+            height: calc(100% - 58px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #f5f5f5;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 服务图片 */
+        .service-image {
+            width: 100%;
+            height: 210px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            position: relative;
+        }
+
+        /* 导航栏（绝对定位在容器内） */
+        .nav-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding-top: 44px;
+        }
+
+        .nav-content {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .nav-back {
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-icon-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* 服务信息卡片 */
+        .service-info-card {
+            background: white;
+            margin: -20px 0 0 0;
+            border-radius: 16px 16px 0 0;
+            padding: 32px 16px 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .service-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .service-price {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff6b35;
+        }
+
+        .price-unit {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .action-item {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .service-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 12px;
+        }
+
+        .service-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 商家信息 */
+        .merchant-section {
+            background: white;
+            margin-top: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .merchant-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .merchant-info {
+            flex: 1;
+        }
+
+        .merchant-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-badge {
+            font-size: 10px;
+            background: #07C160;
+            color: white;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        .merchant-rating {
+            font-size: 12px;
+            color: #ff9500;
+        }
+
+        .follow-btn {
+            padding: 6px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .follow-btn.following {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .follow-btn.not-following {
+            background: #07C160;
+            color: white;
+        }
+
+        /* 服务详情 */
+        .detail-section {
+            background: white;
+            margin-top: 8px;
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 12px;
+        }
+
+        .detail-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .detail-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .detail-tag {
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 评价区 */
+        .review-section {
+            background: white;
+            margin-top: 8px;
+            padding: 16px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .review-more {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .review-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1rpx solid #f0f0f0;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        .review-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .review-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .review-rating {
+            font-size: 11px;
+            color: #ff9500;
+            margin-bottom: 6px;
+        }
+
+        .review-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .review-date {
+            font-size: 11px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        /* 底部安全距离 */
+        .safe-bottom {
+            height: 20px;
+        }
+
+        /* 底部操作栏 */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px 16px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4rpx 16rpx rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .bottom-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .bottom-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .bottom-action-icon {
+            font-size: 20px;
+        }
+
+        .bottom-action-text {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .contact-btn {
+            flex: 1;
+            padding: 10px;
+            background: #07C160;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* 点赞按钮（浮动） */
+        .like-float-btn {
+            position: absolute;
+            right: 20px;
+            bottom: 120px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            z-index: 99;
+        }
+
+        .like-float-icon {
+            font-size: 20px;
+        }
+
+        .like-float-count {
+            font-size: 10px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 导航栏（固定顶部，透明） -->
+        <div class="nav-bar">
+            <div class="nav-content">
+                <div class="nav-back">‹</div>
+            </div>
+        </div>
+
+        <!-- 服务图片 -->
+        <div class="service-image">
+            服务封面图片
+        </div>
+
+        <!-- 可滚动内容 -->
+        <div class="content-scroll">
+            <!-- 服务信息卡片 -->
+            <div class="service-info-card">
+                <div class="service-header">
+                    <div class="service-price">
+                        ¥2,800<span class="price-unit">/件</span>
+                    </div>
+                    <div class="service-actions">
+                        <button class="action-item" onclick="toggleLike()" id="likeIcon">🤍</button>
+                        <button class="action-item" onclick="shareService()">🔗</button>
+                        <button class="action-item" onclick="collectService()" id="collectIcon">🔖</button>
+                    </div>
+                </div>
+                <h1 class="service-title">美国专线小包物流服务</h1>
+                <div class="service-stats">
+                    <span class="stat-item">❤️ <span id="likeCount">234</span></span>
+                    <span class="stat-item">👁️ 1.2k</span>
+                    <span class="stat-item">已售 89</span>
+                </div>
+            </div>
+
+            <!-- 商家信息 -->
+            <div class="merchant-section">
+                <div class="merchant-avatar">张</div>
+                <div class="merchant-info">
+                    <div class="merchant-name">
+                        张三物流
+                        <span class="verified-badge">已认证</span>
+                    </div>
+                    <div class="merchant-rating">⭐ 4.8 | 粉丝 156</div>
+                </div>
+                <button class="follow-btn not-following" id="followBtn" onclick="toggleFollow()">关注</button>
+            </div>
+
+            <!-- 服务详情 -->
+            <div class="detail-section">
+                <h3 class="section-title">服务详情</h3>
+                <div class="detail-text">
+                    <p>专业美国专线小包物流服务，时效稳定，价格优惠。</p>
+                    <br>
+                    <p><strong>服务优势：</strong></p>
+                    <p>1. 时效快：5-8个工作日送达</p>
+                    <p>2. 价格低：首重¥28，续重¥15/500g</p>
+                    <p>3. 覆盖广：支持美国全境配送</p>
+                    <p>4. 服务好：提供全程物流追踪</p>
+                    <br>
+                    <p><strong>适用范围：</strong>跨境电商、个人寄件、样品寄送等</p>
+                </div>
+                <div class="detail-tags">
+                    <span class="detail-tag">美国专线</span>
+                    <span class="detail-tag">小包物流</span>
+                    <span class="detail-tag">时效稳定</span>
+                    <span class="detail-tag">价格优惠</span>
+                </div>
+            </div>
+
+            <!-- 评价区 -->
+            <div class="review-section">
+                <div class="review-header">
+                    <h3 class="section-title">评价 (89)</h3>
+                    <span class="review-more">查看全部 ></span>
+                </div>
+                <div class="review-item">
+                    <div class="review-avatar">李</div>
+                    <div class="review-content">
+                        <div class="review-name">李四贸易</div>
+                        <div class="review-rating">⭐⭐⭐⭐⭐ 5.0</div>
+                        <div class="review-text">服务非常好，时效快，价格合理，推荐！</div>
+                        <div class="review-date">2024-01-15</div>
+                    </div>
+                </div>
+                <div class="review-item">
+                    <div class="review-avatar">王</div>
+                    <div class="review-content">
+                        <div class="review-name">王五电商</div>
+                        <div class="review-rating">⭐⭐⭐⭐ 4.0</div>
+                        <div class="review-text">整体满意，就是客服回复有点慢。</div>
+                        <div class="review-date">2024-01-10</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部安全距离 -->
+            <div class="safe-bottom"></div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="bottom-bar">
+            <div class="bottom-left">
+                <button class="bottom-action" onclick="callMerchant()">
+                    <span class="bottom-action-icon">📞</span>
+                    <span class="bottom-action-text">电话</span>
+                </button>
+                <button class="bottom-action" onclick="chatMerchant()">
+                    <span class="bottom-action-icon">💬</span>
+                    <span class="bottom-action-text">聊天</span>
+                </button>
+            </div>
+            <button class="contact-btn" onclick="contactMerchant()">立即咨询</button>
+        </div>
+    </div>
+
+    <script>
+        let isFollowing = false;
+        let isLiked = false;
+        let isCollected = false;
+        let likeCount = 234;
+
+        function toggleFollow() {
+            isFollowing = !isFollowing;
+            const btn = document.getElementById('followBtn');
+            if (isFollowing) {
+                btn.textContent = '已关注';
+                btn.className = 'follow-btn following';
+            } else {
+                btn.textContent = '关注';
+                btn.className = 'follow-btn not-following';
+            }
+        }
+
+        function toggleLike() {
+            isLiked = !isLiked;
+            likeCount = isLiked ? likeCount + 1 : likeCount - 1;
+            document.getElementById('likeIcon').textContent = isLiked ? '❤️' : '🤍';
+            document.getElementById('likeCount').textContent = likeCount;
+        }
+
+        function shareService() {
+            alert('分享功能开发中...');
+        }
+
+        function collectService() {
+            isCollected = !isCollected;
+            document.getElementById('collectIcon').textContent = isCollected ? '❤️' : '🔖';
+            alert(isCollected ? '已收藏' : '已取消收藏');
+        }
+
+        function callMerchant() {
+            alert('联系电话：138****5678');
+        }
+
+        function chatMerchant() {
+            alert('跳转聊天页面...');
+        }
+
+        function contactMerchant() {
+            alert('立即咨询商家...');
+        }
+    </script>
+</body>
+</html>

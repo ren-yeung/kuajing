@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 需求详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* 微信状态栏 */
+        .wx-status-bar {
+            background: white;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: 600;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        /* 导航栏 */
+        .nav-bar {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 32px;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            border-bottom: 0.5px solid #f0f0f0;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #000;
+            font-size: 15px;
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            flex: 1;
+            text-align: center;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            position: absolute;
+            top: 82px;
+            bottom: 58px;
+            left: 0;
+            right: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: white;
+        }
+
+        .content-section::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 需求信息 - 固定 */
+        .demand-header {
+            padding: 16px 16px 0;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 8px solid #f5f5f5;
+        }
+
+        .demand-header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .demand-status {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e6f1fb;
+            color: #185fa5;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .header-icon-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .demand-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 12px;
+            padding-right: 10px;
+        }
+
+        .demand-budget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .budget-amount {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .demand-deadline {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 发布者信息 */
+        .user-section {
+            padding: 16px;
+            border-bottom: 8px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 需求详情 */
+        .detail-section {
+            padding: 16px;
+            border-bottom: 8px solid #f5f5f5;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 12px;
+        }
+
+        .detail-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .detail-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .detail-tag {
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 报名商家列表 */
+        .merchants-section {
+            padding: 16px;
+        }
+
+        .merchant-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 0.5px solid #f0f0f0;
+        }
+
+        .merchant-card:last-child {
+            border-bottom: none;
+        }
+
+        .merchant-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .merchant-info {
+            flex: 1;
+        }
+
+        .merchant-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .merchant-rating {
+            font-size: 12px;
+            color: #ff9500;
+        }
+
+        .merchant-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .accept-btn {
+            padding: 6px 12px;
+            background: #07C160;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* 底部 Tab 栏（用户版） */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 58px;
+            z-index: 101;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding-top: 8px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-active {
+            color: #07C160;
+        }
+
+        .tab-inactive {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 微信状态栏 -->
+        <div class="wx-status-bar">
+            <span>9:41</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- 导航栏 -->
+        <div class="nav-bar">
+            <div class="nav-back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>返回</span>
+            </div>
+            <h1 class="nav-title">需求详情</h1>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-section">
+            <!-- 需求信息（固定） -->
+            <div class="demand-header">
+                <div class="demand-header-top">
+                    <div class="demand-status">报名中</div>
+                    <div class="header-icons">
+                        <!-- 分享 -->
+                        <div class="header-icon-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </div>
+                        <!-- 收藏 -->
+                        <div class="header-icon-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <h1 class="demand-title">急需美国海外仓一件代发服务</h1>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥10,000-30,000</span></span>
+                    <span class="demand-deadline">截止：2026-06-30</span>
+                </div>
+            </div>
+
+            <!-- 发布者信息 -->
+            <div class="user-section">
+                <div class="user-avatar">陈</div>
+                <div class="user-info">
+                    <div class="user-name">陈小明</div>
+                    <div class="post-time">发布于 2小时前</div>
+                </div>
+            </div>
+
+            <!-- 需求详情 -->
+            <div class="detail-section">
+                <h3 class="section-title">需求详情</h3>
+                <div class="detail-text">
+                    <p>寻找美国加州地区的海外仓，需要提供以下服务：</p>
+                    <br>
+                    <p>1. 一件代发服务</p>
+                    <p>2. 退货处理</p>
+                    <p>3. FBA中转</p>
+                    <p>4. 贴标换标</p>
+                    <br>
+                    <p>月单量500+，希望长期合作。要求时效快、价格合理、服务稳定。</p>
+                </div>
+                <div class="detail-tags">
+                    <span class="detail-tag">海外仓</span>
+                    <span class="detail-tag">一件代发</span>
+                    <span class="detail-tag">美国</span>
+                    <span class="detail-tag">长期合作</span>
+                </div>
+            </div>
+
+            <!-- 报名商家列表 -->
+            <div class="merchants-section">
+                <h3 class="section-title">报名商家 (8)</h3>
+
+                <!-- 商家1 -->
+                <div class="merchant-card">
+                    <div class="merchant-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">张</div>
+                    <div class="merchant-info">
+                        <div class="merchant-name">
+                            张三物流
+                            <span style="font-size: 10px; background: #07C160; color: white; padding: 1px 4px; border-radius: 3px;">已认证</span>
+                        </div>
+                        <div class="merchant-rating">⭐ 4.8 | 已成交 89</div>
+                        <div class="merchant-desc">专业美国海外仓服务</div>
+                    </div>
+                    <button class="accept-btn" onclick="acceptMerchant(this)">接受</button>
+                </div>
+
+                <!-- 商家2 -->
+                <div class="merchant-card">
+                    <div class="merchant-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">李</div>
+                    <div class="merchant-info">
+                        <div class="merchant-name">李四仓储</div>
+                        <div class="merchant-rating">⭐ 4.7 | 已成交 67</div>
+                        <div class="merchant-desc">加州本地海外仓</div>
+                    </div>
+                    <button class="accept-btn" onclick="acceptMerchant(this)">接受</button>
+                </div>
+
+                <!-- 商家3 -->
+                <div class="merchant-card">
+                    <div class="merchant-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">王</div>
+                    <div class="merchant-info">
+                        <div class="merchant-name">
+                            王五物流
+                            <span style="font-size: 10px; background: #07C160; color: white; padding: 1px 4px; border-radius: 3px;">已认证</span>
+                        </div>
+                        <div class="merchant-rating">⭐ 4.9 | 已成交 123</div>
+                        <div class="merchant-desc">全美多仓布局</div>
+                    </div>
+                    <button class="accept-btn" onclick="acceptMerchant(this)">接受</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 Tab 栏（用户版） -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label tab-inactive">首页</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label tab-inactive">消息</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label tab-inactive">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function acceptMerchant(btn) {
+            if (confirm('确定接受该商家的报名吗？接受后对方可以看到您的联系方式。')) {
+                btn.textContent = '已接受';
+                btn.style.background = '#f5f5f5';
+                btn.style.color = '#999';
+                btn.onclick = null;
+                alert('已接受该商家！对方现在可以看到您的联系方式：\n电话：138****5678\n微信：chenxiaoming');
+            }
+        }
+    </script>
+</body>
+</html>

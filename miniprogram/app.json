@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/message/message",
     "pages/profile/profile",
-    "pages/publish-need/publish-need"
+    "pages/publish-need/publish-need",
+    "pages/service-detail/service-detail"
   ],
   "window": {
     "navigationStyle": "custom",

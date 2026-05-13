@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 服务广场（预览版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏（模拟原生） */
+        .nav-bar {
+            background: white;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 0.5px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        /* 搜索栏 */
+        .search-section {
+            padding: 8px 16px 12px;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .search-bar {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .search-placeholder {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* 分类导航 */
+        .category-nav {
+            padding: 8px 0 12px;
+            background: white;
+            flex-shrink: 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0 8px;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 20%;
+            margin-bottom: 4px;
+        }
+
+        .category-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .category-name {
+            font-size: 11px;
+            color: #333;
+        }
+
+        /* 服务列表 */
+        .service-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 16px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .service-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0 12px;
+            background: white;
+            flex-shrink: 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .section-tab {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .section-tab.active {
+            color: #000;
+            font-weight: 600;
+        }
+
+        .section-more {
+            font-size: 13px;
+            color: #999;
+            margin-left: auto;
+        }
+
+        /* 服务卡片 */
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            border: 0.5px solid #e0e0e0;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .service-card-content {
+            display: flex;
+            gap: 14px;
+        }
+
+        .service-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .service-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .service-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .service-provider {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .provider-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .provider-name {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .provider-rating {
+            font-size: 12px;
+            color: #ff9500;
+        }
+
+        .service-desc {
+            font-size: 13px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .service-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stats-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-item {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .contact-btn {
+            padding: 6px 16px;
+            background: #07C160;
+            color: white;
+            border-radius: 14px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 悬浮发布按钮 */
+        .fab-button {
+            position: absolute;
+            bottom: 115px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #07C160;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+            z-index: 100;
+            border: none;
+            cursor: pointer;
+        }
+
+        .fab-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* 底部导航 */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-label.active {
+            color: #07C160;
+        }
+
+        .tab-label.inactive {
+            color: #999;
+        }
+
+        .notification-dot {
+            position: relative;
+        }
+
+        .dot {
+            position: absolute;
+            top: -2px;
+            right: -6px;
+            width: 8px;
+            height: 8px;
+            background: #ff3b30;
+            border-radius: 50%;
+            border: 1.5px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 导航栏 -->
+        <div class="nav-bar">服务广场</div>
+
+        <!-- 搜索栏 -->
+        <div class="search-section">
+            <div class="search-bar">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span class="search-placeholder">搜索服务、商家</span>
+            </div>
+        </div>
+
+        <!-- 分类导航 -->
+        <div class="category-nav">
+            <div class="category-list">
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E6F1FB;">🌐</div>
+                    <span class="category-name">跨境网络</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #EAF3DE;">📦</div>
+                    <span class="category-name">物流服务</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FFF3E0;">🛃</div>
+                    <span class="category-name">报关清关</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FBEAF0;">💰</div>
+                    <span class="category-name">支付结算</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #EEEDFE;">📋</div>
+                    <span class="category-name">合规认证</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FAEEDA;">🎓</div>
+                    <span class="category-name">培训咨询</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E8F0FE;">🖥️</div>
+                    <span class="category-name">建站出海</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FCE4EC;">📢</div>
+                    <span class="category-name">营销投流</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E0F7FA;">🔍</div>
+                    <span class="category-name">选品特供</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E1F5EE;">•••</div>
+                    <span class="category-name">更多</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推荐服务标题（固定区域） -->
+        <div class="section-header">
+            <h2 class="section-title">推荐服务</h2>
+            <span class="section-tab">我的需求</span>
+            <span class="section-more">查看更多 ></span>
+        </div>
+
+        <!-- 服务列表 -->
+        <div class="service-list">
+
+            <!-- 服务卡片 1 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">美国专线小包物流服务</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #E6F1FB; color: #185FA5;">张</div>
+                            <span class="provider-name">张三物流</span>
+                            <span class="provider-rating">⭐ 4.8</span>
+                        </div>
+                        <p class="service-desc">专业美国专线，时效稳定，服务优质</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 234</span>
+                                <span class="stat-item">👁️ 1.2k</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务卡片 2 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">跨境支付结汇一站式服务</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #FAEEDA; color: #854F0B;">李</div>
+                            <span class="provider-name">李四支付</span>
+                            <span class="provider-rating">⭐ 4.9</span>
+                        </div>
+                        <p class="service-desc">合规结汇，费率低，到账快</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 567</span>
+                                <span class="stat-item">👁️ 3.4k</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务卡片 3 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">欧盟CE认证快速办理</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #EAF3DE; color: #3B6D11;">王</div>
+                            <span class="provider-name">王五认证</span>
+                            <span class="provider-rating">⭐ 4.7</span>
+                        </div>
+                        <p class="service-desc">专业团队，快速通过，服务透明</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 189</span>
+                                <span class="stat-item">👁️ 856</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务卡片 4 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">海外仓储一站式服务</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #E1F5EE; color: #0D6832;">赵</div>
+                            <span class="provider-name">赵六仓储</span>
+                            <span class="provider-rating">⭐ 4.6</span>
+                        </div>
+                        <p class="service-desc">美国欧洲海外仓，一件代发，退货处理</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 312</span>
+                                <span class="stat-item">👁️ 1.5k</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务卡片 5 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">TikTok海外广告投放</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #FBEAF0; color: #C4185A;">孙</div>
+                            <span class="provider-name">孙七营销</span>
+                            <span class="provider-rating">⭐ 4.8</span>
+                        </div>
+                        <p class="service-desc">TikTok、Facebook精准投放，提升ROI</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 445</span>
+                                <span class="stat-item">👁️ 2.1k</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务卡片 6 -->
+            <div class="service-card">
+                <div class="service-card-content">
+                    <div class="service-image" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+                        服务图片
+                    </div>
+                    <div class="service-info">
+                        <h3 class="service-title">跨境电商培训咨询</h3>
+                        <div class="service-provider">
+                            <div class="provider-avatar" style="background: #EEEDFE; color: #4A1BB4;">周</div>
+                            <span class="provider-name">周八培训</span>
+                            <span class="provider-rating">⭐ 4.9</span>
+                        </div>
+                        <p class="service-desc">从零开始做跨境电商，全流程指导</p>
+                        <div class="service-stats">
+                            <div class="stats-left">
+                                <span class="stat-item">❤️ 678</span>
+                                <span class="stat-item">👁️ 3.8k</span>
+                            </div>
+                            <button class="contact-btn">立即咨询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 悬浮发布按钮 -->
+        <button class="fab-button">
+            <svg class="fab-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+
+        <!-- 底部导航 -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="#07C160" stroke="#07C160" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label active">首页</span>
+            </div>
+            <div class="tab-item notification-dot">
+                <div class="dot"></div>
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label inactive">消息</span>
+            </div>
+            <div class="tab-item">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label inactive">我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

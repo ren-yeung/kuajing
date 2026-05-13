@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨境服务圈 - 需求广场</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* 微信状态栏 */
+        .wx-status-bar {
+            background: white;
+            padding: 10px 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* 导航栏 */
+        .nav-bar {
+            background: white;
+            padding: 20px 16px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+        }
+
+        .wx-capsule {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            border: 0.5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 5px 12px;
+            gap: 8px;
+        }
+
+        .wx-capsule-divider {
+            width: 0.5px;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* 搜索栏 */
+        .search-section {
+            padding: 8px 16px 12px;
+        }
+
+        .search-bar {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 分类导航 */
+        .category-nav {
+            padding: 12px 16px 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-list {
+            display: flex;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 60px;
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .category-name {
+            font-size: 11px;
+            color: #333;
+        }
+
+        /* 需求列表 */
+        .demand-list {
+            position: absolute;
+            top: 226px;
+            bottom: 58px;
+            left: 0;
+            right: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 16px;
+        }
+
+        .demand-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .section-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 16px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .section-tab {
+            font-size: 13px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .section-tab.active {
+            color: #000;
+            font-weight: 600;
+        }
+
+        .section-more {
+            font-size: 13px;
+            color: #999;
+            margin-left: auto;
+        }
+
+        /* 需求卡片 */
+        .demand-card {
+            background: white;
+            border-radius: 12px;
+            border: 0.5px solid #e0e0e0;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .demand-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .demand-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .demand-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .demand-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 3px 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .demand-budget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .budget-amount {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .demand-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 0.5px solid #f0f0f0;
+        }
+
+        .stats-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-item {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .apply-btn {
+            padding: 6px 16px;
+            background: #07C160;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            border: none;
+            font-weight: 500;
+        }
+
+        /* 底部导航 */
+        .tab-bar {
+            background: white;
+            border-top: 0.5px solid #e0e0e0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 58px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap:2px;
+            padding-top: 8px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-active {
+            color: #07C160;
+        }
+
+        .tab-inactive {
+            color: #999;
+        }
+
+        /* 悬浮发布按钮 */
+        .fab-button {
+            position: absolute;
+            bottom: 85px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #07C160;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+            z-index: 100;
+            border: none;
+            cursor: pointer;
+        }
+
+        .fab-button svg {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 微信状态栏 -->
+        <div class="wx-status-bar">
+            <span>9:41</span>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- 导航栏 -->
+        <div class="nav-bar">
+            <h1 class="nav-title">需求广场</h1>
+            <div class="wx-capsule">
+                <!-- 三个点 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+                    <circle cx="6" cy="12" r="1.5" fill="#000" stroke="none"/>
+                    <circle cx="12" cy="12" r="1.5" fill="#000" stroke="none"/>
+                    <circle cx="18" cy="12" r="1.5" fill="#000" stroke="none"/>
+                </svg>
+                <div class="wx-capsule-divider"></div>
+                <!-- 圆圈 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
+                    <circle cx="12" cy="12" r="8"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 搜索栏 -->
+        <div class="search-section">
+            <div class="search-bar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span style="color: #999; font-size: 14px;">搜索需求</span>
+            </div>
+        </div>
+
+        <!-- 分类导航 -->
+        <div class="category-nav">
+            <div class="category-list">
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E6F1FB;">🌐</div>
+                    <span class="category-name">跨境网络</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #EAF3DE;">📦</div>
+                    <span class="category-name">物流服务</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FBEAF0;">💰</div>
+                    <span class="category-name">支付结算</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #EEEDFE;">📋</div>
+                    <span class="category-name">合规认证</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #FAEDDA;">🎓</div>
+                    <span class="category-name">培训咨询</span>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon" style="background: #E1F5EE;">•••</div>
+                    <span class="category-name">更多</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 需求列表 -->
+        <div class="demand-list">
+            <div class="section-header">
+                <h2 class="section-title">用户需求</h2>
+                <span class="section-tab">我的服务</span>
+                <span class="section-more">查看更多 ></span>
+            </div>
+
+            <!-- 需求卡片 1 -->
+            <div class="demand-card">
+                <div class="demand-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        陈
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">陈小明</div>
+                        <div class="post-time">2小时前发布</div>
+                    </div>
+                </div>
+                <h3 class="demand-title">急需美国海外仓一件代发服务</h3>
+                <p class="demand-desc">寻找美国加州地区的海外仓，需要提供一件代发、退货处理、FBA中转等服务，月单量500+，长期合作。</p>
+                <div class="demand-tags">
+                    <span class="tag">海外仓</span>
+                    <span class="tag">一件代发</span>
+                    <span class="tag">美国</span>
+                </div>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥10,000-30,000</span></span>
+                    <span>截止：2026-06-30</span>
+                </div>
+                <div class="demand-stats">
+                    <div class="stats-left">
+                        <span class="stat-item">👁️ 234</span>
+                        <span class="stat-item">📝 8人报名</span>
+                    </div>
+                    <button class="apply-btn">立即报名</button>
+                </div>
+            </div>
+
+            <!-- 需求卡片 2 -->
+            <div class="demand-card">
+                <div class="demand-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        李
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">李华</div>
+                        <div class="post-time">5小时前发布</div>
+                    </div>
+                </div>
+                <h3 class="demand-title">求推荐靠谱的欧洲VAT税务代理</h3>
+                <p class="demand-desc">公司在德国和法国都有VAT税号，需要找一家专业的税务代理公司，处理季度申报和税务合规问题。</p>
+                <div class="demand-tags">
+                    <span class="tag">VAT税务</span>
+                    <span class="tag">欧洲</span>
+                    <span class="tag">合规</span>
+                </div>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥5,000-15,000</span></span>
+                    <span>截止：2026-07-15</span>
+                </div>
+                <div class="demand-stats">
+                    <div class="stats-left">
+                        <span class="stat-item">👁️ 156</span>
+                        <span class="stat-item">📝 5人报名</span>
+                    </div>
+                    <button class="apply-btn">立即报名</button>
+                </div>
+            </div>
+
+            <!-- 需求卡片 3 -->
+            <div class="demand-card">
+                <div class="demand-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        王
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">王小美</div>
+                        <div class="post-time">1天前发布</div>
+                    </div>
+                </div>
+                <h3 class="demand-title"> TikTok Shop店铺运营指导</h3>
+                <p class="demand-desc">刚入驻TikTok Shop美国站，对平台规则和运营策略不太熟悉，希望找有经验的服务商提供指导。</p>
+                <div class="demand-tags">
+                    <span class="tag">TikTok</span>
+                    <span class="tag">运营指导</span>
+                    <span class="tag">美国</span>
+                </div>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥3,000-8,000</span></span>
+                    <span>截止：2026-06-01</span>
+                </div>
+                <div class="demand-stats">
+                    <div class="stats-left">
+                        <span class="stat-item">👁️ 389</span>
+                        <span class="stat-item">📝 12人报名</span>
+                    </div>
+                    <button class="apply-btn">立即报名</button>
+                </div>
+            </div>
+
+            <!-- 需求卡片 4 -->
+            <div class="demand-card">
+                <div class="demand-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        张
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">张大伟</div>
+                        <div class="post-time">2天前发布</div>
+                    </div>
+                </div>
+                <h3 class="demand-title">需要欧盟CE认证和RoHS检测</h3>
+                <p class="demand-desc">新产品准备进入欧盟市场，需要办理CE认证和RoHS检测，产品是智能穿戴设备，希望快速出证。</p>
+                <div class="demand-tags">
+                    <span class="tag">CE认证</span>
+                    <span class="tag">RoHS</span>
+                    <span class="tag">欧盟</span>
+                </div>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥8,000-20,000</span></span>
+                    <span>截止：2026-08-01</span>
+                </div>
+                <div class="demand-stats">
+                    <div class="stats-left">
+                        <span class="stat-item">👁️ 267</span>
+                        <span class="stat-item">📝 6人报名</span>
+                    </div>
+                    <button class="apply-btn">立即报名</button>
+                </div>
+            </div>
+
+            <!-- 需求卡片 5 -->
+            <div class="demand-card">
+                <div class="demand-header">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        刘
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">刘洋</div>
+                        <div class="post-time">3天前发布</div>
+                    </div>
+                </div>
+                <h3 class="demand-title">跨境电商企业培训需求</h3>
+                <p class="demand-desc">公司团队需要系统性的跨境电商培训，包括平台运营、海外营销、供应链管理等内容，希望上门培训。</p>
+                <div class="demand-tags">
+                    <span class="tag">培训</span>
+                    <span class="tag">团队提升</span>
+                    <span class="tag">上门服务</span>
+                </div>
+                <div class="demand-budget">
+                    <span>预算：<span class="budget-amount">¥15,000-50,000</span></span>
+                    <span>截止：2026-07-30</span>
+                </div>
+                <div class="demand-stats">
+                    <div class="stats-left">
+                        <span class="stat-item">👁️ 445</span>
+                        <span class="stat-item">📝 9人报名</span>
+                    </div>
+                    <button class="apply-btn">立即报名</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 悬浮发布按钮 -->
+        <button class="fab-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+
+        <!-- 底部导航 -->
+        <div class="tab-bar">
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#07C160" stroke="#07C160" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="tab-label tab-active">首页</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span class="tab-label tab-inactive">消息</span>
+            </div>
+            <div class="tab-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="tab-label tab-inactive">我的</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
