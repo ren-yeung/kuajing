@@ -97,7 +97,7 @@ Page({
 
     // 如果本地有用户信息，尝试静默登录（检查单点登录状态）
     if (isLoggedIn && userInfo) {
-      this.silentLogin();
+      this.silentLogin(true);  // 首次加载时允许显示成功弹窗
     } else {
       // 新用户，显示填写界面
       this.setData({ showLoginForm: true });
@@ -130,8 +130,8 @@ Page({
     });
 
     if (isLoggedIn && userInfo) {
-      // 每次进入页面都尝试静默登录（检查单点登录状态）
-      this.silentLogin();
+      // 每次进入页面都尝试静默登录（检查单点登录状态），但不显示成功弹窗
+      this.silentLogin(false);
     } else {
       this.setData({
         isLoggedIn: false,
@@ -459,10 +459,14 @@ Page({
   },
 
   // 登录完成后设置数据
-  finishLogin: function(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin) {
+  // showSuccessToast: 是否显示"登录成功"弹窗，默认true
+  finishLogin: function(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin, showSuccessToast) {
     // 同步更新 userInfo.avatar（用于页面显示）
     userInfo.avatar = avatarUrl;
     isAdmin = isAdmin || userInfo.isAdmin || false;
+    // 默认显示成功弹窗
+    showSuccessToast = (showSuccessToast !== false);
+    
     this.setData({
       isLoggedIn: true,
       userInfo: userInfo,
@@ -482,7 +486,10 @@ Page({
       this.loadUserStats();
     }
     
-    wx.showToast({ title: '登录成功', icon: 'none' });
+    // 只有在真正登录成功时才显示成功提示（首次登录等场景）
+    if (showSuccessToast) {
+      wx.showToast({ title: '登录成功', icon: 'none' });
+    }
     this.calcFixedTopHeight();
   },
 
@@ -524,9 +531,30 @@ Page({
   },
 
   // 静默登录（老用户自动登录）
-  silentLogin: function() {
+  // showSuccessToast: 是否显示"登录成功"弹窗，默认false（避免重复弹窗）
+  silentLogin: function(showSuccessToast) {
     var self = this;
+    var userInfo = login.getUserInfo();
     
+    // 如果本地已有用户信息，先用本地数据更新界面（避免闪烁）
+    if (userInfo) {
+      var isMerchant = userInfo.isMerchant || false;
+      var isAdmin = userInfo.isAdmin || false;
+      var currentRole = login.getCurrentRole();
+      var avatarUrl = userInfo.avatar || '';
+      
+      this.setData({
+        isLoggedIn: true,
+        userInfo: userInfo,
+        isMerchant: isMerchant,
+        isAdmin: isAdmin,
+        currentRole: currentRole,
+        avatarUrl: avatarUrl,
+        showLoginForm: false
+      });
+    }
+    
+    // 调用云函数更新用户信息（检查单点登录状态等）
     login.doLogin()
       .then(function(userInfo) {
         var isMerchant = userInfo.isMerchant || false;
@@ -543,20 +571,19 @@ Page({
               if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
                 avatarUrl = res.fileList[0].tempFileURL;
               }
-              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin, showSuccessToast);
             },
             fail: function() {
-              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin, showSuccessToast);
             }
           });
         } else {
-          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin, showSuccessToast);
         }
       })
       .catch(function(err) {
         console.log('静默登录失败:', err);
-        // 静默登录失败时，显示登录表单
-        self.setData({ showLoginForm: true });
+        // 静默登录失败时，保持本地数据，不显示登录表单
       });
   },
 
