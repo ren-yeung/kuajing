@@ -1,9 +1,12 @@
+const login = require('../../utils/login.js');
+
 Page({
   data: {
     statusBarHeight: 0,
     fixedTopHeight: 0,
     bottomSafeHeight: 0,
     tabBarOuterHeight: 58,
+    isAdmin: false,
     messages: [
       {
         id: 1,
@@ -140,6 +143,42 @@ Page({
         selected: 1
       });
     }
+
+    // 更新管理员状态
+    var userInfo = login.getUserInfo();
+    this.setData({
+      isAdmin: !!(userInfo && userInfo.isAdmin)
+    });
+  },
+
+  // 切换管理员身份
+  switchToAdmin() {
+    var self = this;
+    var userInfo = login.getUserInfo();
+
+    if (!userInfo) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+
+    wx.showModal({
+      title: '切换身份',
+      content: this.data.isAdmin ? '确定切换为普通用户身份？' : '确定切换为管理员身份？',
+      success: function(res) {
+        if (res.confirm) {
+          var newIsAdmin = !self.data.isAdmin;
+          login.setIsAdmin(newIsAdmin);
+
+          if (newIsAdmin) {
+            wx.showToast({ title: '已切换为管理员', icon: 'none' });
+            wx.reLaunch({ url: '/pages/admin-home/admin-home' });
+          } else {
+            wx.showToast({ title: '已切换为普通用户', icon: 'none' });
+            wx.reLaunch({ url: '/pages/index/index' });
+          }
+        }
+      }
+    });
   },
 
   goChat(e) {

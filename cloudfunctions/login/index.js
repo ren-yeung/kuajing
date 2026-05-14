@@ -20,8 +20,10 @@ exports.main = async (event, context) => {
     }).get();
 
     if (userResult.data && userResult.data.length > 0) {
-      // 用户已存在，返回用户信息（如果传了新的昵称/头像则更新）
+      // 用户已存在，更新登录时间
       const user = userResult.data[0];
+
+      // 更新用户信息（如果传了新的昵称/头像则更新）
       const hasNewInfo = event.nickname && event.nickname !== user.nickname && event.nickname !== '微信用户';
 
       if (hasNewInfo) {
@@ -36,32 +38,47 @@ exports.main = async (event, context) => {
         user.avatar = event.avatar || user.avatar;
       }
 
+      // 更新登录时间
+      await db.collection('users').doc(user._id).update({
+        data: {
+          lastLoginTime: db.serverDate(),
+          updateTime: db.serverDate()
+        }
+      });
+
       return {
         success: true,
         data: {
           userId: user._id,
           nickname: user.nickname,
+          merchantNickname: user.merchantNickname || '请修改商家名称',
           avatar: user.avatar || '',
+          merchantAvatar: user.merchantAvatar || '',
           isMerchant: user.isMerchant || false,
           merchantStatus: user.merchantStatus || 'none',
+          isAdmin: user.isAdmin || false,
           isNewUser: false
         }
       };
     }
 
-    // 2. 新用户，创建用户记录（优先使用微信授权的用户信息）
+    // 2. 新用户，创建用户记录
     const nickname = event.nickname || '微信用户';
     const avatar = event.avatar || '';
     const createResult = await db.collection('users').add({
       data: {
         openid: openid,
         nickname: nickname,
+        merchantNickname: '',
         avatar: avatar,
+        merchantAvatar: '',
         gender: event.gender || 0,
         phone: '',
         isMerchant: false,
         merchantStatus: 'none',
-        merchantInfo: null,
+        isAdmin: false,
+        // merchantInfo 字段不设置（新用户默认为 undefined/不存在）
+        lastLoginTime: db.serverDate(),
         createTime: db.serverDate(),
         updateTime: db.serverDate()
       }
@@ -72,9 +89,12 @@ exports.main = async (event, context) => {
       data: {
         userId: createResult._id,
         nickname: nickname,
+        merchantNickname: '',
         avatar: avatar,
+        merchantAvatar: '',
         isMerchant: false,
         merchantStatus: 'none',
+        isAdmin: false,
         isNewUser: true
       }
     };

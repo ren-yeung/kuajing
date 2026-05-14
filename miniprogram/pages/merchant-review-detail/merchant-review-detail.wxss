@@ -1,0 +1,267 @@
+/* 页面整体 */
+page {
+  background: #fff;
+  height: 100%;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* 导航栏 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: #fff;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e5e5;
+  position: relative;
+  z-index: 10;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: #000;
+}
+
+/* 加载状态 */
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+}
+
+/* 内容滚动 */
+.content-scroll {
+  flex: 1;
+  height: 0;
+  padding: 12px 16px;
+  background: #fff;
+}
+
+/* 区块 */
+.section {
+  margin-bottom: 16px;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 16px;
+}
+
+.section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.section-title {
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+/* 信息卡片 */
+.info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 4px 0;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+  text-align: right;
+  max-width: 60%;
+}
+
+.info-row.vertical .info-value {
+  text-align: left;
+  margin-top: 8px;
+  color: #666;
+}
+
+.info-value.reason {
+  color: #FF3B30;
+  background: #FFEBEA;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  max-width: 100%;
+}
+
+.info-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+}
+
+/* 营业执照 */
+.license-wrap {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.license-img {
+  width: 200px;
+  height: 280px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.license-tip {
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+}
+
+/* 状态标签 */
+.status-tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.status-tag.status-pending {
+  background: #FFF3E0;
+  color: #FF9500;
+}
+
+.status-tag.status-approved {
+  background: #E8F8EE;
+  color: #07C160;
+}
+
+.status-tag.status-rejected {
+  background: #FFEBEA;
+  color: #FF3B30;
+}
+
+/* 服务类目 */
+.categories-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.category-tag {
+  font-size: 12px;
+  color: #07C160;
+  background: #E8F8EE;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* 操作区块 */
+.action-section {
+  margin-top: 20px;
+}
+
+.action-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.action-tip {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* 拒绝原因输入 */
+.reject-reason-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.reject-input {
+  width: 100%;
+  height: 100px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.reject-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-size: 12px;
+  color: #999;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.action-btn.approve {
+  background: #07C160;
+  color: #fff;
+}
+
+.action-btn.reject {
+  background: #FF3B30;
+  color: #fff;
+}
+
+.action-btn.confirm-reject {
+  background: #FF3B30;
+  color: #fff;
+}
+
+.action-btn.cancel {
+  background: #f5f5f5;
+  color: #666;
+}

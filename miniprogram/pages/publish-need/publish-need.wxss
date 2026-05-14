@@ -130,6 +130,58 @@ page {
   border-color: #07C160;
 }
 
+/* 预算范围 */
+.budget-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.budget-input {
+  flex: 1;
+}
+
+.budget-separator {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 标签选择 */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag-item {
+  padding: 12rpx 28rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: white;
+}
+
+.tag-selected {
+  background: rgba(7, 193, 96, 0.1);
+  border-color: #07C160;
+  color: #07C160;
+}
+
+/* 日期选择器 */
+.picker-display {
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+}
+
+.picker-display.placeholder {
+  color: #999;
+}
+
 /* 提交按钮 */
 .submit-btn {
   margin: 0;

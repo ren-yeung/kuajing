@@ -157,6 +157,31 @@ Page({
     this.loadDemands();
   },
 
+  // 格式化时间（X小时前、X天前等）
+  formatTimeAgo(createTime) {
+    if (!createTime) return '刚刚';
+    
+    const now = new Date().getTime();
+    let createTimeMs;
+    
+    if (createTime instanceof Date) {
+      createTimeMs = createTime.getTime();
+    } else if (typeof createTime === 'string') {
+      createTimeMs = new Date(createTime).getTime();
+    } else if (createTime.seconds) {
+      createTimeMs = createTime.seconds * 1000 + (createTime.nanoseconds || 0) / 1000000;
+    } else {
+      return '刚刚';
+    }
+    
+    const diff = now - createTimeMs;
+    if (diff < 60000) return '刚刚';
+    if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+    if (diff < 2592000000) return Math.floor(diff / 86400000) + '天前';
+    return Math.floor(diff / 2592000000) + '个月前';
+  },
+
   // 加载需求列表
   loadDemands() {
     const { isLoading, demandHasMore, demandPage, selectedDemandCategoryId, demands, demandActiveTab } = this.data;
@@ -175,7 +200,10 @@ Page({
       success: (res) => {
         let newDemands = [];
         if (res.result && res.result.success && res.result.data && Array.isArray(res.result.data.list)) {
-          newDemands = res.result.data.list;
+          newDemands = res.result.data.list.map(d => ({
+            ...d,
+            postTime: this.formatTimeAgo(d.createTime)
+          }));
         }
 
         // 如果云函数返回空数据，使用mock数据并按分类筛选
@@ -416,6 +444,19 @@ Page({
       login.requireLogin().catch(() => {});
       return;
     }
+    
+    // 检查商家是否审核通过
+    const userInfo = login.getUserInfo();
+    if (userInfo && userInfo.isMerchant && userInfo.merchantStatus === 'pending') {
+      wx.showModal({
+        title: '审核提示',
+        content: '商家资料审核中，审核通过后可访问',
+        showCancel: false,
+        confirmText: '我知道了'
+      });
+      return;
+    }
+    
     wx.showModal({
       title: '报名确认',
       content: '确定要报名此需求吗？',
@@ -809,7 +850,7 @@ Page({
     });
   },
 
-  // 发布服务/需求
+  // 发布需求/服务
   publishService() {
     if (!login.checkLogin()) {
       login.requireLogin().catch(() => {});
@@ -819,50 +860,14 @@ Page({
     const currentRole = this.data.currentRole;
     
     if (currentRole === 'merchant') {
-      // 商家版本：显示选择菜单
-      wx.showActionSheet({
-        itemList: ['发布需求', '发布服务'],
-        success(res) {
-          if (res.tapIndex === 0) {
-            // 发布需求
-            wx.navigateTo({
-              url: '/pages/publish-need/publish-need'
-            });
-          } else {
-            // 发布服务 - 跳转到新的发布服务页面
-            wx.navigateTo({
-              url: '/pages/publish-service/publish-service'
-            });
-          }
-        }
+      // 商家版：跳转发布服务
+      wx.navigateTo({
+        url: '/pages/publish-service/publish-service'
       });
     } else {
-      // 用户版本：显示选择菜单（已通过商家审核的用户显示"发布服务"）
-      const isApprovedMerchant = login.getIsMerchantApproved ? login.getIsMerchantApproved() : false;
-      const itemList = isApprovedMerchant 
-        ? ['发布需求', '发布服务'] 
-        : ['发布需求', '成为商家'];
-      
-      wx.showActionSheet({
-        itemList: itemList,
-        success(res) {
-          if (res.tapIndex === 0) {
-            // 发布需求
-            wx.navigateTo({
-              url: '/pages/publish-need/publish-need'
-            });
-          } else if (isApprovedMerchant) {
-            // 已审核商家：发布服务 - 跳转到新的发布服务页面
-            wx.navigateTo({
-              url: '/pages/publish-service/publish-service'
-            });
-          } else {
-            // 未审核用户：成为商家
-            wx.navigateTo({
-              url: '/pages/merchant-apply/merchant-apply'
-            });
-          }
-        }
+      // 用户版：跳转发布需求
+      wx.navigateTo({
+        url: '/pages/publish-need/publish-need'
       });
     }
   },

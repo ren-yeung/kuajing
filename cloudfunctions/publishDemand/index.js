@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
 
-  const { title, category, description, budgetMin, budgetMax, deadline, images } = event;
+  const { title, category, description, budgetMin, budgetMax, deadline, images, tags, region, phone, avatar, nickname } = event;
 
   // 参数校验
   if (!title) {
@@ -40,16 +40,21 @@ exports.main = async (event, context) => {
     const result = await db.collection('demands').add({
       data: {
         userId: user._id,
-        nickname: user.nickname,
+        nickname: nickname || user.nickname,
+        avatar: avatar || user.avatar || '',
         title: title,
         category: category,
         description: description,
         budgetMin: budgetMin || 0,
         budgetMax: budgetMax || 0,
         deadline: deadline || '',
+        region: region || '',
+        tags: tags || [],
+        phone: phone || '',
         images: images || [],
         status: 'open', // 进行中
         views: 0,
+        applyCount: 0,
         contactCount: 0,
         createTime: db.serverDate(),
         updateTime: db.serverDate()

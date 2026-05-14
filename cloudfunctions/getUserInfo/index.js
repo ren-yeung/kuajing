@@ -24,10 +24,13 @@ exports.main = async (event, context) => {
         data: {
           userId: user._id,
           nickname: user.nickname,
+          merchantNickname: user.merchantNickname || '请修改商家名称',
           avatar: user.avatar || '',
+          merchantAvatar: user.merchantAvatar || '',
           phone: user.phone || '',
           isMerchant: user.isMerchant || false,
           merchantStatus: user.merchantStatus || 'none',
+          isAdmin: user.isAdmin || false,
           createTime: user.createTime
         }
       };

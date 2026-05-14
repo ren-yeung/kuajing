@@ -1,0 +1,144 @@
+<view class="container" style="padding-top: {{statusBarHeight}}px;">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="height: {{navHeight}}px;">
+    <text class="nav-title">审核详情</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 详情内容 -->
+  <scroll-view wx:else scroll-y class="content-scroll">
+    <!-- 用户信息 -->
+    <view class="section">
+      <view class="section-title">用户信息</view>
+      <view class="info-card">
+        <view class="info-row">
+          <text class="info-label">用户昵称</text>
+          <text class="info-value">{{detail.userNickname || '微信用户'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">手机号</text>
+          <text class="info-value">{{detail.userPhone || '未绑定'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">用户头像</text>
+          <image class="info-avatar" src="{{detail.userAvatar || '/images/avatar.png'}}" mode="aspectFill"></image>
+        </view>
+      </view>
+    </view>
+
+    <!-- 公司信息 -->
+    <view class="section">
+      <view class="section-title">公司信息</view>
+      <view class="info-card">
+        <view class="info-row">
+          <text class="info-label">公司名称</text>
+          <text class="info-value">{{detail.companyName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">联系人</text>
+          <text class="info-value">{{detail.contactName || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">联系电话</text>
+          <text class="info-value">{{detail.contactPhone}}</text>
+        </view>
+        <view class="info-row vertical" wx:if="{{detail.description}}">
+          <text class="info-label">公司简介</text>
+          <text class="info-value">{{detail.description}}</text>
+        </view>
+        <view class="info-row vertical" wx:if="{{detail.categories.length > 0}}">
+          <text class="info-label">服务类目</text>
+          <view class="categories-wrap">
+            <text class="category-tag" wx:for="{{detail.categories}}" wx:key="{{item}}">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 营业执照 -->
+    <view class="section">
+      <view class="section-title">资质证明</view>
+      <view class="info-card">
+        <view class="license-wrap">
+          <image 
+            class="license-img" 
+            src="{{detail.businessLicenseUrl || '/images/license-placeholder.png'}}" 
+            mode="aspectFit"
+            bindtap="previewLicense"
+          ></image>
+          <text class="license-tip">点击查看大图</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 审核状态 -->
+    <view class="section">
+      <view class="section-title">审核状态</view>
+      <view class="info-card">
+        <view class="info-row">
+          <text class="info-label">当前状态</text>
+          <view class="status-tag status-{{detail.status}}">
+            <text wx:if="{{detail.status === 'pending'}}">待审核</text>
+            <text wx:elif="{{detail.status === 'approved'}}">已通过</text>
+            <text wx:elif="{{detail.status === 'rejected'}}">已拒绝</text>
+          </view>
+        </view>
+        <view class="info-row">
+          <text class="info-label">申请时间</text>
+          <text class="info-value">{{detail.createTimeStr}}</text>
+        </view>
+        <view class="info-row" wx:if="{{detail.status !== 'pending'}}">
+          <text class="info-label">审核时间</text>
+          <text class="info-value">{{detail.updateTimeStr}}</text>
+        </view>
+        <view class="info-row vertical" wx:if="{{detail.status === 'rejected' && detail.rejectReason}}">
+          <text class="info-label">拒绝原因</text>
+          <text class="info-value reason">{{detail.rejectReason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 审核操作 -->
+    <view class="section action-section" wx:if="{{detail.status === 'pending'}}">
+      <view class="section-title">审核操作</view>
+      <view class="action-card">
+        <view class="action-tip">请仔细核实商家信息后进行审核操作</view>
+        
+        <!-- 拒绝原因输入 -->
+        <view class="reject-reason-wrap" wx:if="{{showRejectInput}}">
+          <textarea 
+            class="reject-input" 
+            placeholder="请输入拒绝原因（必填）" 
+            value="{{rejectReason}}"
+            bindinput="onRejectReasonInput"
+            maxlength="200"
+          ></textarea>
+          <text class="reject-hint">{{rejectReason.length}}/200</text>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="action-buttons">
+          <view class="action-btn approve" bindtap="onApprove">
+            <text>通过申请</text>
+          </view>
+          <view class="action-btn reject" bindtap="onReject" wx:if="{{!showRejectInput}}">
+            <text>拒绝申请</text>
+          </view>
+          <view class="action-btn confirm-reject" bindtap="onConfirmReject" wx:if="{{showRejectInput}}">
+            <text>确认拒绝</text>
+          </view>
+          <view class="action-btn cancel" bindtap="onCancelReject" wx:if="{{showRejectInput}}">
+            <text>取消</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部安全距离 -->
+    <view style="height: 40px;"></view>
+  </scroll-view>
+</view>

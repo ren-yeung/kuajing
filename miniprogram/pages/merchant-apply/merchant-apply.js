@@ -151,17 +151,16 @@ Page({
       success: (res) => {
         wx.hideLoading();
         if (res.result && res.result.success) {
-          // 提交成功后，直接更新本地用户状态为商家（跳过审核）
+          // 提交成功后，更新本地用户状态为待审核
           const userInfo = login.getUserInfo();
           if (userInfo) {
-            userInfo.isMerchant = true;
-            userInfo.merchantStatus = 'approved';
+            userInfo.merchantStatus = 'pending';
             wx.setStorageSync('userInfo', userInfo);
           }
           
           wx.showModal({
-            title: '入驻成功',
-            content: '恭喜您已成为跨境服务圈商家！可在"我的"页面切换商家版本。',
+            title: '申请已提交',
+            content: '您的商家入驻申请已提交，请耐心等待管理员审核。审核结果将通过消息通知您。',
             showCancel: false,
             success: () => {
               wx.navigateBack();
@@ -175,25 +174,8 @@ Page({
       fail: (err) => {
         wx.hideLoading();
         console.error('提交申请失败', err);
-        // 即使云函数调用失败，也允许本地直接成为商家（开发阶段降级方案）
-        const userInfo = login.getUserInfo();
-        if (userInfo) {
-          userInfo.isMerchant = true;
-          userInfo.merchantStatus = 'approved';
-          wx.setStorageSync('userInfo', userInfo);
-          
-          wx.showModal({
-            title: '入驻成功',
-            content: '恭喜您已成为跨境服务圈商家！',
-            showCancel: false,
-            success: () => {
-              wx.navigateBack();
-            }
-          });
-        } else {
-          this.setData({ isSubmitting: false });
-          wx.showToast({ title: '网络错误，请重试', icon: 'none' });
-        }
+        this.setData({ isSubmitting: false });
+        wx.showToast({ title: '网络错误，请重试', icon: 'none' });
       }
     });
   }

@@ -192,3 +192,24 @@ page {
 .safe-bottom {
   height: 20px;
 }
+
+/* 切换管理员按钮 */
+.admin-switch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px;
+  padding: 12px;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
+.admin-switch-icon {
+  font-size: 16px;
+}
+
+.admin-switch-text {
+  font-size: 14px;
+  color: #666;
+}

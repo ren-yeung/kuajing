@@ -4,32 +4,54 @@ Component({
     messageCount: 0
   },
 
+  lifetimes: {
+    ready() {
+      // 初始化选中状态
+      this.initSelected();
+    }
+  },
+
   methods: {
-    switchTab(e) {
-      const index = e.currentTarget.dataset.index;
+    // 根据当前页面初始化选中状态
+    initSelected() {
+      const pages = getCurrentPages();
+      const currentPage = pages[pages.length - 1];
+      const route = currentPage ? currentPage.route : '';
       const currentRole = wx.getStorageSync('currentRole') || 'user';
       
-      // 根据角色决定首页跳转
-      let urls;
-      if (currentRole === 'merchant') {
-        // 商家模式：首页=需求广场（index页面商家模式），消息，我的
-        urls = [
-          '/pages/index/index',
-          '/pages/message/message',
-          '/pages/profile/profile'
-        ];
+      let selected = 0;
+      if (currentRole === 'admin') {
+        if (route.includes('admin-home')) selected = 0;
+        else if (route.includes('message')) selected = 1;
+        else if (route.includes('profile')) selected = 2;
       } else {
-        // 用户模式：首页=服务广场，消息，我的
-        urls = [
-          '/pages/index/index',
-          '/pages/message/message',
-          '/pages/profile/profile'
-        ];
+        if (route.includes('index')) selected = 0;
+        else if (route.includes('message')) selected = 1;
+        else if (route.includes('profile')) selected = 2;
       }
       
-      wx.reLaunch({
-        url: urls[index]
-      });
+      this.setData({ selected });
+    },
+
+    switchTab(e) {
+      const index = parseInt(e.currentTarget.dataset.index);
+      const currentRole = wx.getStorageSync('currentRole') || 'user';
+      
+      let url;
+      if (currentRole === 'admin') {
+        if (index === 0) url = '/pages/admin-home/admin-home';
+        else if (index === 1) url = '/pages/message/message';
+        else if (index === 2) url = '/pages/profile/profile';
+      } else {
+        if (index === 0) url = '/pages/index/index';
+        else if (index === 1) url = '/pages/message/message';
+        else if (index === 2) url = '/pages/profile/profile';
+      }
+      
+      // 使用switchTab跳转到tabBar页面
+      if (url) {
+        wx.switchTab({ url: url });
+      }
     }
   }
 });

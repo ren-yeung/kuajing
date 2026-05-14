@@ -45,6 +45,20 @@ exports.main = async (event, context) => {
       try {
         const userResult = await db.collection('users').doc(demand.userId).get();
         const user = userResult.data;
+        // 格式化预算
+        let budget = '';
+        if (demand.budgetMin > 0 && demand.budgetMax > 0) {
+          budget = `¥${demand.budgetMin.toLocaleString()}-${demand.budgetMax.toLocaleString()}`;
+        } else if (demand.budgetMin > 0) {
+          budget = `¥${demand.budgetMin}+`;
+        } else if (demand.budgetMax > 0) {
+          budget = `¥${demand.budgetMax}以内`;
+        }
+        
+        // 头像文字
+        const nickName = user.nickname || demand.nickname || '匿名';
+        const avatarText = nickName.charAt(0);
+        
         return {
           id: demand._id,
           title: demand.title,
@@ -52,14 +66,32 @@ exports.main = async (event, context) => {
           description: demand.description,
           budgetMin: demand.budgetMin || 0,
           budgetMax: demand.budgetMax || 0,
+          budget: budget,
           deadline: demand.deadline || '',
+          region: demand.region || '',
+          tags: demand.tags || [],
           images: demand.images || [],
-          publisher: user.nickname || '匿名用户',
-          avatar: user.avatar || '',
+          userName: nickName,
+          avatar: demand.avatar || user.avatar || '',
+          avatarText: avatarText,
+          avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          avatarColor: '#fff',
+          views: demand.views || 0,
+          applyCount: demand.applyCount || 0,
           contactCount: demand.contactCount || 0,
           createTime: demand.createTime
         };
       } catch (e) {
+        let budget = '';
+        if (demand.budgetMin > 0 && demand.budgetMax > 0) {
+          budget = `¥${demand.budgetMin.toLocaleString()}-${demand.budgetMax.toLocaleString()}`;
+        } else if (demand.budgetMin > 0) {
+          budget = `¥${demand.budgetMin}+`;
+        } else if (demand.budgetMax > 0) {
+          budget = `¥${demand.budgetMax}以内`;
+        }
+        
+        const nickName = demand.nickname || '匿名';
         return {
           id: demand._id,
           title: demand.title,
@@ -67,10 +99,18 @@ exports.main = async (event, context) => {
           description: demand.description,
           budgetMin: demand.budgetMin || 0,
           budgetMax: demand.budgetMax || 0,
+          budget: budget,
           deadline: demand.deadline || '',
+          region: demand.region || '',
+          tags: demand.tags || [],
           images: demand.images || [],
-          publisher: '匿名用户',
-          avatar: '',
+          userName: nickName,
+          avatar: demand.avatar || '',
+          avatarText: nickName.charAt(0),
+          avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          avatarColor: '#fff',
+          views: demand.views || 0,
+          applyCount: demand.applyCount || 0,
           contactCount: 0,
           createTime: demand.createTime
         };

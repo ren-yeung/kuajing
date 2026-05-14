@@ -5,8 +5,8 @@
     <text class="nav-title">{{currentRole === 'merchant' ? '商家主页' : '个人主页'}}</text>
   </view>
 
-  <!-- 未登录：会员卡风格引导登录 -->
-  <view class="member-card" wx:if="{{!isLoggedIn}}">
+  <!-- 新用户未填写信息：显示登录表单 -->
+  <view class="member-card" wx:if="{{showLoginForm && !isLoggedIn}}">
     <view class="member-card-body">
       <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <image class="default-avatar" src="{{pendingAvatar || '/images/avatar.png'}}" mode="aspectFill"></image>
@@ -28,8 +28,8 @@
     </view>
   </view>
 
-  <!-- 已登录：用户模式 -->
-  <view wx:elif="{{isLoggedIn && currentRole === 'user'}}">
+  <!-- 已登录：用户模式 / 管理员模式 -->
+  <view wx:elif="{{isLoggedIn && (currentRole === 'user' || currentRole === 'admin')}}">
     <view class="profile-inner">
       <view class="profile-header">
         <image class="profile-avatar" src="{{userInfo.avatar}}" bindtap="onChooseLocalImage"></image>
@@ -69,7 +69,12 @@
     <view class="merchant-profile">
       <view class="merchant-avatar-wrap">
         <view class="merchant-avatar" style="background: {{merchantInfo.avatarBg}};" bindtap="onChooseLocalImage">
-          <text class="merchant-avatar-text" style="color: {{merchantInfo.avatarColor}};">{{merchantInfo.avatarText}}</text>
+          <block wx:if="{{merchantInfo.avatarUrl}}">
+            <image class="merchant-avatar-img" src="{{merchantInfo.avatarUrl}}" mode="aspectFill"></image>
+          </block>
+          <block wx:else>
+            <text class="merchant-avatar-text" style="color: {{merchantInfo.avatarColor}};">{{merchantInfo.avatarText}}</text>
+          </block>
         </view>
         <view class="merchant-info">
           <view class="merchant-name-row">
@@ -112,7 +117,7 @@
   </view>
 
   <!-- 四个数据卡片（关注、收藏、点赞、咨询）- 仅未登录显示 -->
-  <view class="info-cards" wx:if="{{!isLoggedIn}}" style="margin-top: 8px;">
+  <view class="info-cards" wx:if="{{showLoginForm && !isLoggedIn}}" style="margin-top: 8px;">
     <view class="info-card" bindtap="onLogin">
       <view class="info-card-left">
         <text class="info-card-label">关注：<text class="info-card-num">0</text></text>
@@ -144,7 +149,7 @@
   </view>
 
   <!-- 未登录：9个分类导航网格 -->
-  <view class="guest-grid" wx:if="{{!isLoggedIn}}" style="margin: 12px 16px;">
+  <view class="guest-grid" wx:if="{{showLoginForm && !isLoggedIn}}" style="margin: 12px 16px;">
     <view class="guest-grid-list">
       <view class="guest-grid-item"
             wx:for="{{guestCategories}}"
@@ -170,8 +175,8 @@
 >
   <!-- 已登录：完整菜单列表 -->
   <block wx:if="{{isLoggedIn}}">
-    <!-- 第一组：我的发布、我的点赞、我的收藏、浏览历史 -->
-    <view class="menu-section">
+    <!-- 第一组：用户版 -->
+    <view class="menu-section" wx:if="{{currentRole === 'user' || currentRole === 'admin'}}">
       <view class="menu-list">
         <view class="menu-item" bindtap="goPage" data-page="myPosts">
           <view class="menu-left">
@@ -201,6 +206,43 @@
           <view class="menu-left">
             <view class="menu-icon">📱</view>
             <text class="menu-label">浏览历史</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 第一组：商家版 -->
+    <view class="menu-section" wx:if="{{currentRole === 'merchant'}}">
+      <view class="menu-list">
+        <view class="menu-item" bindtap="goPage" data-page="myPosts">
+          <view class="menu-left">
+            <view class="menu-icon">📝</view>
+            <text class="menu-label">我的服务</text>
+            <text class="menu-count">{{stats.publish || 0}}篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="goPage" data-page="myLikes">
+          <view class="menu-left">
+            <view class="menu-icon">❤️</view>
+            <text class="menu-label">服务订单</text>
+            <text class="menu-count">28篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="goPage" data-page="myFavorites">
+          <view class="menu-left">
+            <view class="menu-icon">⭐</view>
+            <text class="menu-label">评论管理</text>
+            <text class="menu-count">15篇</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="goPage" data-page="history">
+          <view class="menu-left">
+            <view class="menu-icon">📱</view>
+            <text class="menu-label">数据统计</text>
           </view>
           <text class="menu-arrow">›</text>
         </view>
@@ -251,7 +293,15 @@
           </view>
           <text class="menu-arrow">›</text>
         </view>
-        <view class="menu-item" bindtap="goPage" data-page="help">
+        <!-- 帮助与反馈 / 切换管理员 -->
+        <view class="menu-item" wx:if="{{isAdmin && currentRole !== 'admin'}}" bindtap="onSwitchAdmin">
+          <view class="menu-left">
+            <view class="menu-icon" style="background: #F44336;">🔐</view>
+            <text class="menu-label">切换管理员</text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" wx:if="{{!isAdmin || currentRole === 'admin'}}" bindtap="goPage" data-page="help">
           <view class="menu-left">
             <view class="menu-icon">❓</view>
             <text class="menu-label">帮助与反馈</text>
@@ -260,13 +310,39 @@
         </view>
         <!-- 根据身份状态显示不同按钮 -->
         <block wx:if="{{isLoggedIn}}">
-          <view class="menu-item" wx:if="{{currentRole === 'user'}}" bindtap="onSwitchRole">
+          <!-- 管理员模式：切换用户版（隐藏"切换管理员"，只显示此按钮） -->
+          <view class="menu-item" wx:if="{{currentRole === 'admin'}}" bindtap="onSwitchAdmin">
+            <view class="menu-left">
+              <view class="menu-icon" style="background: #F44336;">🔐</view>
+              <text class="menu-label">切换用户版</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+          <!-- 用户模式：待审核状态显示"等待审核" -->
+          <view class="menu-item" wx:if="{{currentRole === 'user' && userInfo.merchantStatus === 'pending'}}" bindtap="onPendingStatus">
+            <view class="menu-left">
+              <view class="menu-icon" style="background: #FFF3E0;">⏳</view>
+              <text class="menu-label">等待审核</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+          <!-- 用户模式：非审核通过且非待审核显示"成为商家" -->
+          <view class="menu-item" wx:if="{{currentRole === 'user' && userInfo.merchantStatus !== 'approved' && userInfo.merchantStatus !== 'pending'}}" bindtap="goPage" data-page="becomeMerchant">
+            <view class="menu-left">
+              <view class="menu-icon" style="background: #E8F5E9;">🏪</view>
+              <text class="menu-label">成为商家</text>
+            </view>
+            <text class="menu-arrow">›</text>
+          </view>
+          <!-- 用户模式：审核通过显示"切换商家版" -->
+          <view class="menu-item" wx:if="{{currentRole === 'user' && userInfo.merchantStatus === 'approved'}}" bindtap="onSwitchRole">
             <view class="menu-left">
               <view class="menu-icon" style="background: #FFF3E0;">🔄</view>
               <text class="menu-label">切换商家版</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>
+          <!-- 商家模式 -->
           <view class="menu-item switch-role-btn" wx:if="{{currentRole === 'merchant'}}" bindtap="onSwitchRole">
             <view class="menu-left">
               <view class="menu-icon" style="background: #F5F5F5;">🔄</view>

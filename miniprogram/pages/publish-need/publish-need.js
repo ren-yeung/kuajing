@@ -15,8 +15,11 @@ Page({
       budgetMin: '',
       budgetMax: '',
       deadline: '',
-      phone: ''
+      phone: '',
+      region: ''
     },
+    tags: ['时效快', '价格低', '覆盖广', '服务好', '可追踪', '包清关', '专线物流', '小包服务'],
+    selectedTags: [],
     isSubmitting: false
   },
 
@@ -75,9 +78,26 @@ Page({
     });
   },
 
+  // 切换标签选择
+  toggleTag(e) {
+    const tag = e.currentTarget.dataset.tag;
+    const { selectedTags } = this.data;
+    const index = selectedTags.indexOf(tag);
+    if (index > -1) {
+      selectedTags.splice(index, 1);
+    } else {
+      if (selectedTags.length >= 3) {
+        wx.showToast({ title: '最多选择3个标签', icon: 'none' });
+        return;
+      }
+      selectedTags.push(tag);
+    }
+    this.setData({ selectedTags: [...selectedTags] });
+  },
+
   // 提交表单
   submitForm() {
-    const { form, selectedCategory, isSubmitting } = this.data;
+    const { form, selectedCategory, isSubmitting, selectedTags } = this.data;
 
     if (isSubmitting) return;
 
@@ -94,6 +114,9 @@ Page({
     this.setData({ isSubmitting: true });
     wx.showLoading({ title: '发布中...' });
 
+    // 获取当前用户信息
+    const userInfo = login.getUserInfo();
+
     // 调用云函数发布需求
     wx.cloud.callFunction({
       name: 'publishDemand',
@@ -104,7 +127,11 @@ Page({
         budgetMin: form.budgetMin ? parseFloat(form.budgetMin) : 0,
         budgetMax: form.budgetMax ? parseFloat(form.budgetMax) : 0,
         deadline: form.deadline || '',
-        phone: form.phone || ''
+        phone: form.phone || '',
+        region: form.region || '',
+        tags: selectedTags,
+        avatar: userInfo ? userInfo.avatar : '',
+        nickname: userInfo ? userInfo.nickname : ''
       },
       success: (res) => {
         wx.hideLoading();

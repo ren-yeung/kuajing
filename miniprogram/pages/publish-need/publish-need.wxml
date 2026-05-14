@@ -61,6 +61,54 @@
     />
   </view>
 
+  <!-- 预算范围 -->
+  <view class="form-group">
+    <text class="form-label">预算范围</text>
+    <view class="budget-row">
+      <input
+        class="form-input budget-input"
+        type="digit"
+        placeholder="最低"
+        value="{{form.budgetMin}}"
+        bindinput="onInput"
+        data-field="budgetMin"
+      />
+      <text class="budget-separator">-</text>
+      <input
+        class="form-input budget-input"
+        type="digit"
+        placeholder="最高"
+        value="{{form.budgetMax}}"
+        bindinput="onInput"
+        data-field="budgetMax"
+      />
+    </view>
+  </view>
+
+  <!-- 需求标签 -->
+  <view class="form-group">
+    <text class="form-label">需求标签（最多3个）</text>
+    <view class="tag-list">
+      <view
+        class="tag-item {{selectedTags.indexOf(item) > -1 ? 'tag-selected' : ''}}"
+        wx:for="{{tags}}"
+        wx:key="*this"
+        bindtap="toggleTag"
+        data-tag="{{item}}"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 截止日期 -->
+  <view class="form-group">
+    <text class="form-label required">截止日期</text>
+    <picker mode="date" bindchange="onDateChange" value="{{form.deadline}}" start="{{today}}">
+      <view class="picker-display {{form.deadline ? '' : 'placeholder'}}">
+        {{form.deadline || '请选择截止日期'}}
+      </view>
+    </picker>
+  </view>
+
   <!-- 联系电话 -->
   <view class="form-group">
     <text class="form-label required">联系电话</text>

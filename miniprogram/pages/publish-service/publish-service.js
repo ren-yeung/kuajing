@@ -34,6 +34,21 @@ Page({
   },
 
   onLoad() {
+    // 检查商家是否审核通过
+    const userInfo = login.getUserInfo();
+    if (userInfo && userInfo.isMerchant && userInfo.merchantStatus === 'pending') {
+      wx.showModal({
+        title: '审核提示',
+        content: '商家资料审核中，审核通过后可发布服务',
+        showCancel: false,
+        confirmText: '我知道了',
+        success: () => {
+          wx.navigateBack();
+        }
+      });
+      return;
+    }
+    
     const systemInfo = wx.getSystemInfoSync();
     const statusBarHeight = systemInfo.statusBarHeight;
     const navHeight = statusBarHeight + 44;

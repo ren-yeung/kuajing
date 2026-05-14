@@ -3,11 +3,14 @@
     "pages/index/index",
     "pages/message/message",
     "pages/profile/profile",
+    "pages/admin-home/admin-home",
     "pages/publish-need/publish-need",
     "pages/publish-service/publish-service",
     "pages/service-detail/service-detail",
     "pages/merchant-apply/merchant-apply",
-    "pages/merchant-profile/merchant-profile"
+    "pages/merchant-profile/merchant-profile",
+    "pages/merchant-review-list/merchant-review-list",
+    "pages/merchant-review-detail/merchant-review-detail"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -30,6 +33,10 @@
       {
         "pagePath": "pages/profile/profile",
         "text": "我的"
+      },
+      {
+        "pagePath": "pages/admin-home/admin-home",
+        "text": "管理后台"
       }
     ]
   },

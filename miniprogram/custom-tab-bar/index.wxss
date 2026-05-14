@@ -17,9 +17,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4rpx;
   position: relative;
   flex: 1;
+  min-height: 80rpx;
+  touch-action: manipulation;
 }
 
 .tab-icon-text {

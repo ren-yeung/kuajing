@@ -1,0 +1,123 @@
+<!-- 固定区域：导航栏 -->
+<view class="admin-header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="nav-content">
+    <text class="nav-title">管理后台</text>
+  </view>
+</view>
+
+<!-- 可滚动区域 -->
+<scroll-view
+  class="admin-scroll"
+  scroll-y
+  enhanced
+  show-scrollbar="{{false}}"
+>
+  <!-- 数据看板 -->
+  <view class="stats-section">
+    <view class="section-title">数据看板</view>
+    <view class="stats-grid">
+      <view class="stat-card">
+        <view class="stat-icon" style="background: #E8F5E9;">👥</view>
+        <view class="stat-info">
+          <text class="stat-value">{{stats.totalUsers}}</text>
+          <text class="stat-label">用户总数</text>
+        </view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon" style="background: #E3F2FD;">🏪</view>
+        <view class="stat-info">
+          <text class="stat-value">{{stats.totalMerchants}}</text>
+          <text class="stat-label">商家总数</text>
+        </view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon" style="background: #FFF3E0;">⏳</view>
+        <view class="stat-info">
+          <text class="stat-value">{{stats.pendingApprovals}}</text>
+          <text class="stat-label">待审核</text>
+        </view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon" style="background: #FCE4EC;">📈</view>
+        <view class="stat-info">
+          <text class="stat-value">{{stats.todayVisits}}</text>
+          <text class="stat-label">今日访问</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 待办事项 -->
+  <view class="todo-section">
+    <view class="section-header">
+      <view class="section-title">待办事项</view>
+      <view class="section-more" bindtap="onViewMore" data-type="todo">查看全部 ›</view>
+    </view>
+    <view class="todo-list">
+      <view class="todo-item" bindtap="onTodoTap" data-type="approve">
+        <view class="todo-icon" style="background: {{todoList[0].color}}20;">
+          <text style="color: {{todoList[0].color}};">{{todoList[0].icon}}</text>
+        </view>
+        <view class="todo-info">
+          <text class="todo-title">{{todoList[0].title}}</text>
+          <text class="todo-count">{{todoList[0].count}}条待处理</text>
+        </view>
+        <view class="todo-arrow">›</view>
+      </view>
+      <view class="todo-item" bindtap="onTodoTap" data-type="feedback">
+        <view class="todo-icon" style="background: {{todoList[1].color}}20;">
+          <text style="color: {{todoList[1].color}};">{{todoList[1].icon}}</text>
+        </view>
+        <view class="todo-info">
+          <text class="todo-title">{{todoList[1].title}}</text>
+          <text class="todo-count">{{todoList[1].count}}条待处理</text>
+        </view>
+        <view class="todo-arrow">›</view>
+      </view>
+      <view class="todo-item" bindtap="onTodoTap" data-type="notice">
+        <view class="todo-icon" style="background: {{todoList[2].color}}20;">
+          <text style="color: {{todoList[2].color}};">{{todoList[2].icon}}</text>
+        </view>
+        <view class="todo-info">
+          <text class="todo-title">{{todoList[2].title}}</text>
+          <text class="todo-count">{{todoList[2].count}}条待处理</text>
+        </view>
+        <view class="todo-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-section">
+    <view class="section-title">快捷入口</view>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="onQuickAction" data-page="merchantApprove">
+        <view class="quick-icon" style="background: {{quickActions[0].color}};">
+          <text>{{quickActions[0].icon}}</text>
+        </view>
+        <text class="quick-title">{{quickActions[0].title}}</text>
+      </view>
+      <view class="quick-item" bindtap="onQuickAction" data-page="contentManage">
+        <view class="quick-icon" style="background: {{quickActions[1].color}};">
+          <text>{{quickActions[1].icon}}</text>
+        </view>
+        <text class="quick-title">{{quickActions[1].title}}</text>
+      </view>
+      <view class="quick-item" bindtap="onQuickAction" data-page="userManage">
+        <view class="quick-icon" style="background: {{quickActions[2].color}};">
+          <text>{{quickActions[2].icon}}</text>
+        </view>
+        <text class="quick-title">{{quickActions[2].title}}</text>
+      </view>
+      <view class="quick-item" bindtap="onQuickAction" data-page="dataStats">
+        <view class="quick-icon" style="background: {{quickActions[3].color}};">
+          <text>{{quickActions[3].icon}}</text>
+        </view>
+        <text class="quick-title">{{quickActions[3].title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全距离 -->
+  <view class="safe-bottom" style="height: {{bottomSafeHeight > 0 ? bottomSafeHeight + 20 : 20}}px;"></view>
+</scroll-view>

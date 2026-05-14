@@ -40,7 +40,7 @@ function requireLogin() {
   });
 }
 
-// 执行登录 - 获取微信登录凭证 + 调用云函数（基础版，不获取用户信息）
+// 执行登录 - 获取微信登录凭证 + 调用云函数
 function doLogin() {
   return new Promise((resolve, reject) => {
     wx.login({
@@ -51,7 +51,9 @@ function doLogin() {
         }
         wx.cloud.callFunction({
           name: CLOUD_FUNCTION.login,
-          data: { loginCode: loginRes.code },
+          data: {
+            loginCode: loginRes.code
+          },
           success: (res) => {
             if (res.result && res.result.success) {
               const userData = res.result.data;
@@ -61,6 +63,7 @@ function doLogin() {
                 avatar: userData.avatar,
                 isMerchant: userData.isMerchant,
                 merchantStatus: userData.merchantStatus,
+                isAdmin: userData.isAdmin || false,
                 isNewUser: userData.isNewUser,
                 loginTime: Date.now()
               };
@@ -109,6 +112,7 @@ function doLoginWithInfo(nickname, avatar) {
                 avatar: userData.avatar || avatar,
                 isMerchant: userData.isMerchant,
                 merchantStatus: userData.merchantStatus,
+                isAdmin: userData.isAdmin || false,
                 isNewUser: userData.isNewUser,
                 loginTime: Date.now()
               };
@@ -148,9 +152,12 @@ function fetchUserInfo() {
           const userInfo = {
             userId: userData.userId,
             nickname: userData.nickname,
+            merchantNickname: userData.merchantNickname || '',
             avatar: userData.avatar,
+            merchantAvatar: userData.merchantAvatar || '',
             isMerchant: userData.isMerchant,
             merchantStatus: userData.merchantStatus,
+            isAdmin: userData.isAdmin || false,
             loginTime: Date.now()
           };
           wx.setStorageSync('userInfo', userInfo);
@@ -252,6 +259,43 @@ function getIsMerchantApproved() {
   return !!(userInfo && userInfo.isMerchant && userInfo.merchantStatus === 'approved');
 }
 
+// 获取是否管理员（同步）
+function getIsAdmin() {
+  const userInfo = getUserInfo();
+  return !!(userInfo && userInfo.isAdmin);
+}
+
+// 设置是否管理员
+function setIsAdmin(isAdmin) {
+  const userInfo = getUserInfo();
+  if (userInfo) {
+    userInfo.isAdmin = isAdmin;
+    wx.setStorageSync('userInfo', userInfo);
+    // 同步更新 currentRole
+    if (isAdmin) {
+      wx.setStorageSync('currentRole', 'admin');
+    } else {
+      wx.setStorageSync('currentRole', 'user');
+    }
+  }
+}
+
+// 切换管理员身份
+function switchAdmin() {
+  const userInfo = getUserInfo();
+  if (!userInfo) return Promise.reject('未登录');
+  const newIsAdmin = !userInfo.isAdmin;
+  setIsAdmin(newIsAdmin);
+  return Promise.resolve(newIsAdmin);
+}
+
+// 获取管理员切换文本
+function getSwitchAdminText() {
+  const userInfo = getUserInfo();
+  if (!userInfo || !userInfo.isAdmin) return '';
+  return userInfo.isAdmin ? '退出管理' : '';
+}
+
 module.exports = {
   checkLogin,
   requireLogin,
@@ -266,5 +310,9 @@ module.exports = {
   setCurrentRole,
   switchRole,
   getSwitchRoleText,
-  getIsMerchantApproved
+  getIsMerchantApproved,
+  getIsAdmin,
+  setIsAdmin,
+  switchAdmin,
+  getSwitchAdminText
 };

@@ -1,0 +1,202 @@
+/* 页面容器 */
+.admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.nav-content {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-scroll {
+  height: calc(100vh - 56px);
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: 100px;
+}
+
+/* 通用标题 */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-more {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 数据看板 */
+.stats-section {
+  padding: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* 待办事项 */
+.todo-section {
+  padding: 0 16px 16px;
+}
+
+.todo-list {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.todo-info {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.todo-title {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.todo-count {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.todo-arrow {
+  font-size: 16px;
+  color: #ccc;
+}
+
+/* 快捷入口 */
+.quick-section {
+  padding: 0 16px 16px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.quick-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.quick-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+}
+
+.quick-title {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* 底部安全距离 */
+.safe-bottom {
+  width: 100%;
+}

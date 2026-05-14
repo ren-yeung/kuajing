@@ -22,8 +22,10 @@ Page({
     isLoggedIn: false,
     userInfo: null,
     isMerchant: false,
+    isAdmin: false,
     currentRole: 'user',
     switchRoleText: '',
+    showLoginForm: true,  // 默认显示登录表单（新用户）
     mood: '',
     logDate: '',
     logText: '',
@@ -32,8 +34,10 @@ Page({
     menuScrollTop: 0,
     avatarUrl: '',
     nickname: '',
+    merchantNickname: '',
     pendingAvatar: '',
     pendingNickname: '',
+    pendingMerchantNickname: '',
     stats: {
       publish: 0,
       consult: 0,
@@ -73,6 +77,7 @@ Page({
     var userInfo = login.getUserInfo();
     var isLoggedIn = !!userInfo;
     var isMerchant = userInfo ? (userInfo.isMerchant || false) : false;
+    var isAdmin = userInfo ? (userInfo.isAdmin || false) : false;
     var currentRole = login.getCurrentRole();
     var switchRoleText = login.getSwitchRoleText();
 
@@ -84,18 +89,18 @@ Page({
       isLoggedIn: isLoggedIn,
       userInfo: userInfo,
       isMerchant: isMerchant,
+      isAdmin: isAdmin,
       currentRole: currentRole,
       switchRoleText: switchRoleText,
       avatarUrl: userInfo ? userInfo.avatar : ''
     });
 
-    if (isLoggedIn) {
-      // 根据角色加载不同数据
-      if (currentRole === 'merchant') {
-        this.loadMerchantInfo();
-      } else {
-        this.loadUserStats();
-      }
+    // 如果本地有用户信息，尝试静默登录（检查单点登录状态）
+    if (isLoggedIn && userInfo) {
+      this.silentLogin();
+    } else {
+      // 新用户，显示填写界面
+      this.setData({ showLoginForm: true });
     }
   },
 
@@ -116,48 +121,23 @@ Page({
     // 同步更新登录状态（应对登录/退出变化）
     var userInfo = login.getUserInfo();
     var isLoggedIn = !!userInfo;
+    var isAdmin = userInfo ? (userInfo.isAdmin || false) : false;
+    var currentRole = login.getCurrentRole();
 
-    if (isLoggedIn) {
-      var isMerchant = userInfo.isMerchant || false;
-      var currentRole = login.getCurrentRole();
-      var switchRoleText = login.getSwitchRoleText();
-      var avatarUrl = userInfo.avatar;
+    this.setData({
+      isAdmin: isAdmin,
+      currentRole: currentRole
+    });
 
-      this.setData({
-        isLoggedIn: true,
-        userInfo: userInfo,
-        isMerchant: isMerchant,
-        currentRole: currentRole,
-        switchRoleText: switchRoleText,
-        avatarUrl: avatarUrl
-      });
-
-      // 异步转换云存储头像URL
-      if (avatarUrl && avatarUrl.startsWith('cloud://')) {
-        wx.cloud.getTempFileURL({
-          fileList: [avatarUrl],
-          success: (res) => {
-            if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
-              avatarUrl = res.fileList[0].tempFileURL;
-              userInfo.avatar = avatarUrl;
-              this.setData({
-                userInfo: userInfo,
-                avatarUrl: avatarUrl
-              });
-            }
-          }
-        });
-      }
-      this.loadUserStats();
-      // 如果是商家模式，加载商家信息
-      if (currentRole === 'merchant') {
-        this.loadMerchantInfo();
-      }
+    if (isLoggedIn && userInfo) {
+      // 每次进入页面都尝试静默登录（检查单点登录状态）
+      this.silentLogin();
     } else {
       this.setData({
         isLoggedIn: false,
         userInfo: null,
-        isMerchant: false
+        isMerchant: false,
+        showLoginForm: true
       });
       this.calcGuestGridHeight();
     }
@@ -228,9 +208,21 @@ Page({
       sourceType: ['album', 'camera'],
       success: function(res) {
         var tempFilePath = res.tempFilePaths[0];
+        var currentRole = self.data.currentRole;
         
         // 立即显示选择的图片
-        self.setData({ avatarUrl: tempFilePath });
+        if (currentRole === 'merchant') {
+          // 商家模式：更新商家头像
+          var merchantInfo = self.data.merchantInfo;
+          merchantInfo.avatarUrl = tempFilePath;
+          self.setData({ 
+            merchantInfo: merchantInfo,
+            avatarUrl: tempFilePath
+          });
+        } else {
+          // 用户模式：更新用户头像
+          self.setData({ avatarUrl: tempFilePath });
+        }
         
         // 如果已登录，上传到云存储并更新
         if (self.data.isLoggedIn && self.data.userInfo) {
@@ -249,20 +241,59 @@ Page({
                   
                   // 更新本地存储的用户信息
                   var userInfo = self.data.userInfo;
-                  userInfo.avatar = newAvatarUrl;
+                  
+                  // 根据角色更新对应的头像
+                  if (currentRole === 'merchant') {
+                    // 商家模式：更新商家头像
+                    userInfo.merchantAvatar = newAvatarUrl;
+                  } else {
+                    // 用户模式：更新用户头像
+                    userInfo.avatar = newAvatarUrl;
+                  }
                   wx.setStorageSync('userInfo', userInfo);
-                  self.setData({ userInfo: userInfo });
                   
                   // 转换为临时URL显示
                   wx.cloud.getTempFileURL({
                     fileList: [newAvatarUrl],
                     success: function(urlRes) {
                       if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
-                        userInfo.avatar = urlRes.fileList[0].tempFileURL;
-                        self.setData({ userInfo: userInfo, avatarUrl: urlRes.fileList[0].tempFileURL });
+                        var tempUrl = urlRes.fileList[0].tempFileURL;
+                        
+                        if (currentRole === 'merchant') {
+                          // 更新商家头像
+                          userInfo.merchantAvatar = tempUrl;
+                          wx.setStorageSync('userInfo', userInfo);
+                          var merchantInfo = self.data.merchantInfo;
+                          merchantInfo.avatarUrl = tempUrl;
+                          self.setData({ 
+                            userInfo: userInfo, 
+                            merchantInfo: merchantInfo
+                          });
+                        } else {
+                          // 更新用户头像
+                          userInfo.avatar = tempUrl;
+                          wx.setStorageSync('userInfo', userInfo);
+                          self.setData({ 
+                            userInfo: userInfo, 
+                            avatarUrl: tempUrl 
+                          });
+                        }
+                      }
+                    },
+                    fail: function() {
+                      // 转换失败，使用fileID
+                      if (currentRole === 'merchant') {
+                        var merchantInfo = self.data.merchantInfo;
+                        merchantInfo.avatarUrl = newAvatarUrl;
+                        self.setData({ userInfo: userInfo, merchantInfo: merchantInfo });
+                      } else {
+                        self.setData({ userInfo: userInfo, avatarUrl: newAvatarUrl });
                       }
                     }
                   });
+                  
+                  // 同步头像到云端
+                  self.syncAvatarToCloud(currentRole, newAvatarUrl);
                   
                   wx.showToast({ title: '头像更新成功', icon: 'none' });
                 },
@@ -289,12 +320,53 @@ Page({
 
   // 昵称输入
   onNicknameInput: function(e) {
-    this.setData({ pendingNickname: e.detail.value });
+    var currentRole = this.data.currentRole;
+    if (currentRole === 'merchant') {
+      this.setData({ pendingMerchantNickname: e.detail.value });
+    } else {
+      this.setData({ pendingNickname: e.detail.value });
+    }
   },
 
   // 昵称输入完成
   onNicknameBlur: function(e) {
-    this.setData({ pendingNickname: e.detail.value });
+    var currentRole = this.data.currentRole;
+    if (currentRole === 'merchant') {
+      this.setData({ pendingMerchantNickname: e.detail.value });
+    } else {
+      this.setData({ pendingNickname: e.detail.value });
+    }
+  },
+
+  // 商家昵称确认修改
+  onMerchantNicknameConfirm: function() {
+    var self = this;
+    var pendingMerchantNickname = this.data.pendingMerchantNickname;
+    var userInfo = this.data.userInfo;
+
+    if (!pendingMerchantNickname || pendingMerchantNickname.trim() === '') {
+      wx.showToast({ title: '请输入商家昵称', icon: 'none' });
+      return;
+    }
+
+    // 更新本地存储
+    userInfo.merchantNickname = pendingMerchantNickname.trim();
+    wx.setStorageSync('userInfo', userInfo);
+
+    // 更新页面显示
+    var merchantInfo = self.data.merchantInfo;
+    merchantInfo.name = pendingMerchantNickname.trim();
+    merchantInfo.avatarText = pendingMerchantNickname.trim().charAt(0).toUpperCase();
+    self.setData({
+      userInfo: userInfo,
+      merchantInfo: merchantInfo,
+      merchantNickname: pendingMerchantNickname.trim()
+    });
+
+    // 同步到云端
+    self.syncNicknameToCloud('merchant', pendingMerchantNickname.trim());
+
+    wx.showToast({ title: '商家昵称已更新', icon: 'none' });
   },
 
   // 点击确认登录
@@ -358,6 +430,7 @@ Page({
     login.doLoginWithInfo(nickname, avatar)
       .then(function(userInfo) {
         var isMerchant = userInfo.isMerchant || false;
+        var isAdmin = userInfo.isAdmin || false;
         var currentRole = login.getCurrentRole();
         var switchRoleText = login.getSwitchRoleText();
         
@@ -370,14 +443,14 @@ Page({
               if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
                 avatarUrl = res.fileList[0].tempFileURL;
               }
-              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
             },
             fail: function() {
-              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
             }
           });
         } else {
-          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl);
+          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
         }
       })
       .catch(function(err) {
@@ -386,19 +459,29 @@ Page({
   },
 
   // 登录完成后设置数据
-  finishLogin: function(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl) {
+  finishLogin: function(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin) {
     // 同步更新 userInfo.avatar（用于页面显示）
     userInfo.avatar = avatarUrl;
+    isAdmin = isAdmin || userInfo.isAdmin || false;
     this.setData({
       isLoggedIn: true,
       userInfo: userInfo,
       isMerchant: isMerchant,
+      isAdmin: isAdmin,
       currentRole: currentRole,
       switchRoleText: switchRoleText,
       nickname: userInfo.nickname,
-      avatarUrl: avatarUrl
+      avatarUrl: avatarUrl,
+      showLoginForm: false  // 隐藏登录表单
     });
-    this.loadUserStats();
+    
+    // 根据角色加载不同数据
+    if (currentRole === 'merchant') {
+      this.loadMerchantInfo();
+    } else {
+      this.loadUserStats();
+    }
+    
     wx.showToast({ title: '登录成功', icon: 'none' });
     this.calcFixedTopHeight();
   },
@@ -440,6 +523,43 @@ Page({
     this.setData({ menuScrollTop: 0 });
   },
 
+  // 静默登录（老用户自动登录）
+  silentLogin: function() {
+    var self = this;
+    
+    login.doLogin()
+      .then(function(userInfo) {
+        var isMerchant = userInfo.isMerchant || false;
+        var isAdmin = userInfo.isAdmin || false;
+        var currentRole = login.getCurrentRole();
+        var switchRoleText = login.getSwitchRoleText();
+        
+        // 如果是云存储fileID，需要转换为临时URL
+        var avatarUrl = userInfo.avatar;
+        if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+          wx.cloud.getTempFileURL({
+            fileList: [avatarUrl],
+            success: function(res) {
+              if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
+                avatarUrl = res.fileList[0].tempFileURL;
+              }
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+            },
+            fail: function() {
+              self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+            }
+          });
+        } else {
+          self.finishLogin(userInfo, isMerchant, currentRole, switchRoleText, avatarUrl, isAdmin);
+        }
+      })
+      .catch(function(err) {
+        console.log('静默登录失败:', err);
+        // 静默登录失败时，显示登录表单
+        self.setData({ showLoginForm: true });
+      });
+  },
+
   // 退出登录
   onLogout: function() {
     var self = this;
@@ -455,6 +575,7 @@ Page({
             isMerchant: false,
             currentRole: 'user',
             switchRoleText: '',
+            showLoginForm: true,
             stats: { publish: 0, consult: 0, cooperate: 0 }
           });
           wx.showToast({ title: '已退出登录', icon: 'none' });
@@ -462,6 +583,29 @@ Page({
         }
       }
     });
+  },
+
+  // 切换管理员身份
+  onSwitchAdmin: function() {
+    var currentRole = this.data.currentRole;
+    var isAdmin = this.data.isAdmin;
+    
+    if (currentRole === 'admin') {
+      // 当前是管理员，切换回用户版
+      wx.setStorageSync('isAdmin', false);
+      wx.setStorageSync('currentRole', 'user');
+      wx.switchTab({ url: '/pages/index/index' });
+    } else {
+      // 当前是用户/商家，切换为管理员
+      if (!isAdmin) {
+        wx.showToast({ title: '您没有管理员权限', icon: 'none' });
+        return;
+      }
+      
+      wx.setStorageSync('isAdmin', true);
+      wx.setStorageSync('currentRole', 'admin');
+      wx.switchTab({ url: '/pages/admin-home/admin-home' });
+    }
   },
 
   // 加载用户统计数据（模拟）
@@ -485,8 +629,13 @@ Page({
     var userInfo = login.getUserInfo();
     if (!userInfo) return;
 
-    // 模拟商家数据（后续对接后端）
-    var avatarText = userInfo.nickname ? userInfo.nickname.charAt(0).toUpperCase() : '商';
+    var self = this;
+    // 优先使用商家昵称，如果为空则显示"请修改商家名称"
+    var merchantNickname = userInfo.merchantNickname;
+    if (!merchantNickname || merchantNickname === '') {
+      merchantNickname = '请修改商家名称';
+    }
+    var avatarText = merchantNickname.charAt(0).toUpperCase();
     var avatarBgs = [
       'linear-gradient(135deg, #FF9A8B 0%, #FE6E9A 100%)',
       'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
@@ -495,21 +644,132 @@ Page({
     ];
     var avatarBg = avatarBgs[userInfo.userId ? userInfo.userId.charCodeAt(0) % avatarBgs.length : 0];
 
+    // 使用独立的商家头像 merchantAvatar
+    var avatarUrl = userInfo.merchantAvatar || userInfo.avatar || '';
+    if (avatarUrl && avatarUrl.startsWith('cloud://')) {
+      wx.cloud.getTempFileURL({
+        fileList: [avatarUrl],
+        success: function(res) {
+          if (res.fileList && res.fileList[0] && res.fileList[0].tempFileURL) {
+            avatarUrl = res.fileList[0].tempFileURL;
+          }
+          self.setData({
+            merchantInfo: {
+              name: merchantNickname || '商家名称',
+              avatarText: avatarText,
+              avatarBg: avatarBg,
+              avatarColor: '#fff',
+              avatarUrl: avatarUrl,
+              description: userInfo.merchantDescription || userInfo.signature || '专业服务商',
+              isVerified: userInfo.merchantStatus === 'approved',
+              fans: userInfo.fans || 156,
+              likes: userInfo.likes || 2323,
+              deals: userInfo.deals || 89,
+              rating: (userInfo.rating && userInfo.rating > 0) ? userInfo.rating.toFixed(1) : '4.8'
+            },
+            merchantNickname: merchantNickname,
+            pendingMerchantNickname: merchantNickname
+          });
+        },
+        fail: function() {
+          self.setData({
+            merchantInfo: {
+              name: merchantNickname || '商家名称',
+              avatarText: avatarText,
+              avatarBg: avatarBg,
+              avatarColor: '#fff',
+              avatarUrl: '',
+              description: userInfo.merchantDescription || userInfo.signature || '专业服务商',
+              isVerified: userInfo.merchantStatus === 'approved',
+              fans: userInfo.fans || 156,
+              likes: userInfo.likes || 2323,
+              deals: userInfo.deals || 89,
+              rating: (userInfo.rating && userInfo.rating > 0) ? userInfo.rating.toFixed(1) : '4.8'
+            },
+            merchantNickname: merchantNickname,
+            pendingMerchantNickname: merchantNickname
+          });
+        }
+      });
+    } else {
+      this.setData({
+        merchantInfo: {
+          name: merchantNickname || '商家名称',
+          avatarText: avatarText,
+          avatarBg: avatarBg,
+          avatarColor: '#fff',
+          avatarUrl: avatarUrl,
+          description: userInfo.merchantDescription || userInfo.signature || '专业服务商',
+          isVerified: userInfo.merchantStatus === 'approved',
+          fans: userInfo.fans || 156,
+          likes: userInfo.likes || 2323,
+          deals: userInfo.deals || 89,
+          rating: (userInfo.rating && userInfo.rating > 0) ? userInfo.rating.toFixed(1) : '4.8'
+        },
+        merchantNickname: merchantNickname,
+        pendingMerchantNickname: merchantNickname
+      });
+    }
+
     this.setData({
-      merchantInfo: {
-        name: userInfo.nickname || '商家名称',
-        avatarText: avatarText,
-        avatarBg: avatarBg,
-        avatarColor: '#fff',
-        description: userInfo.merchantDescription || userInfo.signature || '专业服务商',
-        isVerified: userInfo.merchantStatus === 'approved',
-        fans: userInfo.fans || 156,
-        likes: userInfo.likes || 2323,
-        deals: userInfo.deals || 89,
-        rating: (userInfo.rating && userInfo.rating > 0) ? userInfo.rating.toFixed(1) : '4.8'
-      },
       logDate: '今天 14:30',
       merchantLogText: '今日新增3个意向客户'
+    });
+  },
+
+  // 同步头像到云端
+  syncAvatarToCloud: function(role, avatarUrl) {
+    var userInfo = login.getUserInfo();
+    if (!userInfo) return;
+    
+    var updateData = {};
+    if (role === 'merchant') {
+      updateData.merchantAvatar = avatarUrl;
+    } else {
+      updateData.avatar = avatarUrl;
+    }
+    
+    wx.cloud.callFunction({
+      name: 'updateUserInfo',
+      data: updateData,
+      success: function(res) {
+        if (res.result && res.result.success) {
+          console.log('头像同步云端成功');
+        } else {
+          console.log('头像同步云端失败:', res.result.errMsg);
+        }
+      },
+      fail: function(err) {
+        console.error('头像同步云端失败', err);
+      }
+    });
+  },
+
+  // 同步昵称到云端
+  syncNicknameToCloud: function(role, nickname) {
+    var userInfo = login.getUserInfo();
+    if (!userInfo) return;
+    
+    var updateData = {};
+    if (role === 'merchant') {
+      updateData.merchantNickname = nickname;
+    } else {
+      updateData.nickname = nickname;
+    }
+    
+    wx.cloud.callFunction({
+      name: 'updateUserInfo',
+      data: updateData,
+      success: function(res) {
+        if (res.result && res.result.success) {
+          console.log('昵称同步云端成功');
+        } else {
+          console.log('昵称同步云端失败:', res.result.errMsg);
+        }
+      },
+      fail: function(err) {
+        console.error('昵称同步云端失败', err);
+      }
     });
   },
 
@@ -517,6 +777,16 @@ Page({
   onStatTap: function(e) {
     var type = e.currentTarget.dataset.type;
     wx.showToast({ title: '功能开发中', icon: 'none' });
+  },
+
+  // 待审核状态点击
+  onPendingStatus: function() {
+    wx.showModal({
+      title: '审核进行中',
+      content: '您的商家资料正在审核中，请耐心等待。审核结果将通过消息通知您。',
+      showCancel: false,
+      confirmText: '我知道了'
+    });
   },
 
   goPage: function(e) {
@@ -540,7 +810,9 @@ Page({
       myMessages: '/pages/message/message',
       notifications: '/pages/notifications/notifications',
       editProfile: '/pages/edit-profile/edit-profile',
-      becomeMerchant: '/pages/merchant-apply/merchant-apply'
+      becomeMerchant: '/pages/merchant-apply/merchant-apply',
+      adminHome: '/pages/admin-home/admin-home',
+      help: '/pages/help/help'
     };
 
     var url = pageMap[page];

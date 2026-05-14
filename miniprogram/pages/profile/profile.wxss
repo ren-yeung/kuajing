@@ -473,6 +473,12 @@ page {
   font-weight: 600;
 }
 
+.merchant-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
 .merchant-info {
   flex: 1;
   min-width: 0;
@@ -525,6 +531,38 @@ page {
   margin-top: 12px;
 }
 
+/* 商家昵称编辑 */
+.merchant-nickname-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 6px 12px;
+}
+
+.merchant-nickname-input {
+  flex: 1;
+  font-size: 13px;
+  color: #333;
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.merchant-nickname-input::placeholder {
+  color: #999;
+}
+
+.merchant-nickname-confirm {
+  font-size: 13px;
+  color: #07C160;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
 /* 商家统计数据（参照用户版格式） */
 .merchant-stats {
   display: flex;
@@ -533,4 +571,11 @@ page {
   background: white;
   border-top: 1rpx solid #f0f0f0;
   border-bottom: 1rpx solid #f0f0f0;
+}
+
+/* 开发测试入口 */
+.menu-section-title {
+  font-size: 12px;
+  color: #999;
+  padding: 12px 16px 4px;
 }

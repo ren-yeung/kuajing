@@ -78,7 +78,12 @@ Page({
       success: (res) => {
         const user = res.data;
         if (user) {
-          const avatarText = user.nickname ? user.nickname.charAt(0).toUpperCase() : '商';
+          // 优先使用商家昵称，如果为空则显示"请修改商家名称"
+          let merchantNickname = user.merchantNickname;
+          if (!merchantNickname || merchantNickname === '') {
+            merchantNickname = '请修改商家名称';
+          }
+          const avatarText = merchantNickname.charAt(0).toUpperCase();
           const avatarBgs = [
             'linear-gradient(135deg, #FF9A8B 0%, #FE6E9A 100%)',
             'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
@@ -86,12 +91,16 @@ Page({
             'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)'
           ];
           const avatarBg = avatarBgs[user._id.charCodeAt(0) % avatarBgs.length];
+          
+          // 优先使用商家头像，否则使用用户头像
+          const avatarUrl = user.merchantAvatar || user.avatar || '';
 
           this.setData({
             merchantInfo: {
-              name: user.nickname || '商家名称',
+              name: merchantNickname || '商家名称',
               avatarText: avatarText,
               avatarBg: avatarBg,
+              avatarUrl: avatarUrl,
               description: user.merchantDescription || user.signature || '专业海外仓—件代发',
               isVerified: user.merchantStatus === 'approved',
               merchantStatus: user.merchantStatus || 'pending',
