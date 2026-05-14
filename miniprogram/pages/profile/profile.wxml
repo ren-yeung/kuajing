@@ -68,7 +68,7 @@
   <view wx:elif="{{isLoggedIn && currentRole === 'merchant'}}">
     <view class="merchant-profile">
       <view class="merchant-avatar-wrap">
-        <view class="merchant-avatar" style="background: {{merchantInfo.avatarBg}};">
+        <view class="merchant-avatar" style="background: {{merchantInfo.avatarBg}};" bindtap="onChooseLocalImage">
           <text class="merchant-avatar-text" style="color: {{merchantInfo.avatarColor}};">{{merchantInfo.avatarText}}</text>
         </view>
         <view class="merchant-info">
