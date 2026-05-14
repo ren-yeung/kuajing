@@ -2,12 +2,11 @@
 <view class="fixed-top" style="padding-top: {{statusBarHeight}}px; background: {{isLoggedIn ? '#ffffff' : '#f5f5f5'}};">
   <!-- 导航栏（在固定区域内） -->
   <view class="nav-content">
-    <text class="nav-title">个人主页</text>
+    <text class="nav-title">{{currentRole === 'merchant' ? '商家主页' : '个人主页'}}</text>
   </view>
 
-  <!-- 未登录：会员卡风格引导登录（参考图） -->
+  <!-- 未登录：会员卡风格引导登录 -->
   <view class="member-card" wx:if="{{!isLoggedIn}}">
-    <!-- 主体：头像在左，昵称+登录垂直排列在右 -->
     <view class="member-card-body">
       <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <image class="default-avatar" src="{{pendingAvatar || '/images/avatar.png'}}" mode="aspectFill"></image>
@@ -29,8 +28,8 @@
     </view>
   </view>
 
-  <!-- 已登录：个人资料 -->
-  <view wx:else>
+  <!-- 已登录：用户模式 -->
+  <view wx:elif="{{isLoggedIn && currentRole === 'user'}}">
     <view class="profile-inner">
       <view class="profile-header">
         <image class="profile-avatar" src="{{userInfo.avatar}}" bindtap="onChooseLocalImage"></image>
@@ -61,6 +60,53 @@
       <view class="stat-item">
         <text class="stat-number">{{stats.cooperate}}</text>
         <text class="stat-label">成功合作</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 已登录：商家模式 -->
+  <view wx:elif="{{isLoggedIn && currentRole === 'merchant'}}">
+    <view class="merchant-profile">
+      <view class="merchant-avatar-wrap">
+        <view class="merchant-avatar" style="background: {{merchantInfo.avatarBg}};">
+          <text class="merchant-avatar-text" style="color: {{merchantInfo.avatarColor}};">{{merchantInfo.avatarText}}</text>
+        </view>
+        <view class="merchant-info">
+          <view class="merchant-name-row">
+            <text class="merchant-name">{{merchantInfo.name}}</text>
+            <view class="merchant-verified" wx:if="{{merchantInfo.isVerified}}">✓ 已认证</view>
+          </view>
+          <text class="merchant-desc">{{merchantInfo.description}}</text>
+        </view>
+        <view class="merchant-settings" bindtap="goPage" data-page="settings">
+          <text class="settings-icon">⚙️</text>
+        </view>
+      </view>
+
+      <!-- 商家动态日志 -->
+      <view class="merchant-log">
+        <view class="log-date">{{logDate}}</view>
+        <view class="log-text">{{merchantLogText}}</view>
+      </view>
+    </view>
+
+    <!-- 商家统计数据（参照用户版格式） -->
+    <view class="merchant-stats">
+      <view class="stat-item" bindtap="onStatTap" data-type="fans">
+        <text class="stat-number">{{merchantInfo.fans}}</text>
+        <text class="stat-label">粉丝</text>
+      </view>
+      <view class="stat-item" bindtap="onStatTap" data-type="likes">
+        <text class="stat-number">{{merchantInfo.likes}}</text>
+        <text class="stat-label">获赞</text>
+      </view>
+      <view class="stat-item" bindtap="onStatTap" data-type="deals">
+        <text class="stat-number">{{merchantInfo.deals}}</text>
+        <text class="stat-label">成交</text>
+      </view>
+      <view class="stat-item" bindtap="onStatTap" data-type="rating">
+        <text class="stat-number">{{merchantInfo.rating}}</text>
+        <text class="stat-label">评分</text>
       </view>
     </view>
   </view>
@@ -97,7 +143,7 @@
     </view>
   </view>
 
-  <!-- 未登录：9个分类导航网格（固定显示，随页面一起滚动） -->
+  <!-- 未登录：9个分类导航网格 -->
   <view class="guest-grid" wx:if="{{!isLoggedIn}}" style="margin: 12px 16px;">
     <view class="guest-grid-list">
       <view class="guest-grid-item"
@@ -214,17 +260,17 @@
         </view>
         <!-- 根据身份状态显示不同按钮 -->
         <block wx:if="{{isLoggedIn}}">
-          <view class="menu-item" wx:if="{{!isMerchant}}" bindtap="goPage" data-page="becomeMerchant">
+          <view class="menu-item" wx:if="{{currentRole === 'user'}}" bindtap="onSwitchRole">
             <view class="menu-left">
-              <view class="menu-icon" style="background: #FFF3E0;">🏪</view>
-              <text class="menu-label" style="color: #FF6B00;">成为商家</text>
+              <view class="menu-icon" style="background: #FFF3E0;">🔄</view>
+              <text class="menu-label">切换商家版</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>
-          <view class="menu-item switch-role-btn" wx:else bindtap="onSwitchRole">
+          <view class="menu-item switch-role-btn" wx:if="{{currentRole === 'merchant'}}" bindtap="onSwitchRole">
             <view class="menu-left">
               <view class="menu-icon" style="background: #F5F5F5;">🔄</view>
-              <text class="menu-label">{{switchRoleText}}</text>
+              <text class="menu-label">切换用户版</text>
             </view>
             <text class="menu-arrow">›</text>
           </view>
@@ -233,7 +279,7 @@
         <view class="menu-item" bindtap="onLogout">
           <view class="menu-left">
             <view class="menu-icon">🚪</view>
-            <text class="menu-label" style="color: #ff3b30;">退出登录</text>
+            <text class="menu-label">退出登录</text>
           </view>
           <text class="menu-arrow">›</text>
         </view>

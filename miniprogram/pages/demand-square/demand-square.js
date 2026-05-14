@@ -59,13 +59,32 @@ Page({
 
   onReady() {
     this.calcFixedTopHeight();
+    this.splitCategories();
+  },
+
+  // 将分类分成两行（每行5个）
+  splitCategories: function() {
+    var categories = this.data.categories;
+    var categoriesRow1 = categories.slice(0, 5);
+    var categoriesRow2 = categories.slice(5, 10);
+    this.setData({
+      categoriesRow1: categoriesRow1,
+      categoriesRow2: categoriesRow2
+    });
   },
 
   onShow() {
-    // 设置自定义tabBar：首页=0（根据角色决定是服务广场还是需求广场）
+    // 设置自定义tabBar：商家模式下需求广场是首页=0
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 });
+      var currentRole = login.getCurrentRole();
+      // 商家模式下需求广场作为首页，selected=0
+      // 用户模式下，selected 根据实际 tab 位置（demand-square 在列表中是 index 1）
+      var selected = currentRole === 'merchant' ? 0 : 1;
+      this.getTabBar().setData({ selected: selected });
     }
+
+    // 重新计算悬浮按钮位置
+    this.calcFabBottom();
 
     this.calcFixedTopHeight();
     if (this.data.demands.length === 0) {
@@ -80,6 +99,25 @@ Page({
         this.loadDemands();
       });
     }
+  },
+
+  // 计算悬浮按钮底部距离
+  calcFabBottom() {
+    const systemInfo = wx.getSystemInfoSync();
+    const safeArea = systemInfo.safeArea;
+    let bottomSafeHeight = 0;
+    let tabBarOuterHeight = 58;
+
+    if (safeArea) {
+      bottomSafeHeight = systemInfo.windowHeight - safeArea.bottom;
+      tabBarOuterHeight = 50 + bottomSafeHeight;
+    }
+
+    this.setData({
+      bottomSafeHeight: bottomSafeHeight,
+      tabBarOuterHeight: tabBarOuterHeight,
+      fabBottom: tabBarOuterHeight + 10
+    });
   },
 
   onPullDownRefresh() {
@@ -114,12 +152,27 @@ Page({
           newDemands = res.result.data.list;
         }
 
-        // 如果没有获取到真实数据，保留现有数据（可能是已显示的mock数据）
+        // 如果没有获取到真实数据，使用mock数据并按分类过滤
         if (newDemands.length === 0) {
-          console.log('云函数返回空数据，保留现有数据');
-          this.setData({
-            hasMore: false
-          });
+          console.log('云函数返回空数据，使用mock数据');
+          var mockData = this.getMockDemands();
+          // 按分类过滤
+          if (selectedCategoryId === 0) {
+            // 全部：不过滤
+            this.setData({
+              demands: mockData,
+              hasMore: false
+            });
+          } else {
+            var categoryName = this.getCategoryName(selectedCategoryId);
+            var filteredData = mockData.filter(function(item) {
+              return item.category === categoryName;
+            });
+            this.setData({
+              demands: filteredData,
+              hasMore: false
+            });
+          }
         } else {
           this.setData({
             demands: page === 1 ? newDemands : demands.concat(newDemands),
@@ -131,10 +184,20 @@ Page({
       },
       fail: (err) => {
         console.error('获取需求列表失败', err);
-        // 失败时如果有现有数据就保留，没有才用mock
-        if (this.data.demands.length === 0) {
+        // 失败时使用mock数据并按分类过滤
+        var mockData = this.getMockDemands();
+        if (selectedCategoryId === 0) {
           this.setData({
-            demands: this.getMockDemands(),
+            demands: mockData,
+            hasMore: false
+          });
+        } else {
+          var categoryName = this.getCategoryName(selectedCategoryId);
+          var filteredData = mockData.filter(function(item) {
+            return item.category === categoryName;
+          });
+          this.setData({
+            demands: filteredData,
             hasMore: false
           });
         }
@@ -159,6 +222,7 @@ Page({
         avatarColor: '#fff',
         postTime: '2小时前发布',
         tags: ['海外仓', '一件代发', '美国'],
+        category: '物流服务',
         budget: '¥10,000-30,000',
         deadline: '2026-06-30',
         views: 234,
@@ -177,6 +241,7 @@ Page({
         avatarColor: '#fff',
         postTime: '5小时前发布',
         tags: ['VAT税务', '欧洲', '合规'],
+        category: '合规认证',
         budget: '¥5,000-15,000',
         deadline: '2026-07-15',
         views: 156,
@@ -195,6 +260,7 @@ Page({
         avatarColor: '#fff',
         postTime: '1天前发布',
         tags: ['TikTok', '运营指导', '美国'],
+        category: '培训咨询',
         budget: '¥3,000-8,000',
         deadline: '2026-06-01',
         views: 389,
@@ -213,6 +279,7 @@ Page({
         avatarColor: '#fff',
         postTime: '2天前发布',
         tags: ['CE认证', 'RoHS', '欧盟'],
+        category: '合规认证',
         budget: '¥8,000-20,000',
         deadline: '2026-08-01',
         views: 267,
@@ -231,6 +298,7 @@ Page({
         avatarColor: '#fff',
         postTime: '3天前发布',
         tags: ['培训', '团队提升', '上门服务'],
+        category: '培训咨询',
         budget: '¥15,000-50,000',
         deadline: '2026-07-30',
         views: 445,
@@ -249,6 +317,7 @@ Page({
         avatarColor: '#333',
         postTime: '4小时前发布',
         tags: ['亚马逊', 'Listing优化', '运营'],
+        category: '营销投流',
         budget: '¥2,000-5,000',
         deadline: '2026-05-30',
         views: 178,
@@ -267,6 +336,7 @@ Page({
         avatarColor: '#333',
         postTime: '6小时前发布',
         tags: ['FBA头程', '日本', '物流'],
+        category: '物流服务',
         budget: '¥8,000-15,000/月',
         deadline: '长期合作',
         views: 312,
@@ -285,6 +355,7 @@ Page({
         avatarColor: '#fff',
         postTime: '1天前发布',
         tags: ['Shopify', '独立站', 'Google Ads'],
+        category: '建站出海',
         budget: '¥20,000-50,000',
         deadline: '2026-06-15',
         views: 523,
@@ -303,6 +374,7 @@ Page({
         avatarColor: '#333',
         postTime: '2天前发布',
         tags: ['英国VAT', '合规咨询', '税务'],
+        category: '合规认证',
         budget: '¥3,000-8,000',
         deadline: '2026-06-20',
         views: 198,
@@ -321,6 +393,7 @@ Page({
         avatarColor: '#333',
         postTime: '3天前发布',
         tags: ['红人营销', 'Instagram', 'YouTube'],
+        category: '营销投流',
         budget: '¥10,000-30,000',
         deadline: '2026-07-01',
         views: 421,

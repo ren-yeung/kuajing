@@ -13,13 +13,13 @@
     </view>
   </view>
   
-  <!-- 分类导航 - 横向滚动 -->
+  <!-- 分类导航 - 两行网格 -->
   <view class="category-nav">
-    <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-      <view class="category-list">
+    <view class="category-grid">
+      <view class="category-row">
         <view 
           class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}" 
-          wx:for="{{categories}}" 
+          wx:for="{{categoriesRow1}}" 
           wx:key="id" 
           bindtap="selectCategory" 
           data-id="{{item.id}}"
@@ -30,7 +30,21 @@
           <text class="category-name">{{item.name}}</text>
         </view>
       </view>
-    </scroll-view>
+      <view class="category-row">
+        <view 
+          class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}" 
+          wx:for="{{categoriesRow2}}" 
+          wx:key="id" 
+          bindtap="selectCategory" 
+          data-id="{{item.id}}"
+        >
+          <view class="category-icon" style="background: {{item.bgColor}};">
+            <text>{{item.icon}}</text>
+          </view>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
   </view>
   
   <!-- Tab切换 -->
