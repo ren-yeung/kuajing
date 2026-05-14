@@ -25,6 +25,8 @@ Page({
     form: {
       title: '',
       description: '',
+      advantage: '',
+      scope: '',
       price: '',
       phone: '',
       images: []
@@ -99,10 +101,10 @@ Page({
   // 选择图片
   chooseImage() {
     const currentCount = this.data.form.images.length;
-    const remainCount = 9 - currentCount;
+    const remainCount = 6 - currentCount;
 
     if (remainCount <= 0) {
-      wx.showToast({ title: '最多上传9张图片', icon: 'none' });
+      wx.showToast({ title: '最多上传6张图片', icon: 'none' });
       return;
     }
 
@@ -233,6 +235,23 @@ Page({
       wx.showToast({ title: '请输入服务描述', icon: 'none' });
       return;
     }
+    if (!form.advantage.trim()) {
+      wx.showToast({ title: '请输入服务优势', icon: 'none' });
+      return;
+    }
+    if (!form.scope.trim()) {
+      wx.showToast({ title: '请输入适用范围', icon: 'none' });
+      return;
+    }
+    if (selectedTags.length === 0) {
+      wx.showToast({ title: '请至少选择1个服务标签', icon: 'none' });
+      return;
+    }
+    // 验证图片数量（最少1张，最多6张）
+    if (form.images.length < 1) {
+      wx.showToast({ title: '请至少上传1张服务图片', icon: 'none' });
+      return;
+    }
     if (!form.price.trim()) {
       wx.showToast({ title: '请输入服务价格', icon: 'none' });
       return;
@@ -289,6 +308,8 @@ Page({
           title: form.title.trim(),
           category: selectedCategory,
           description: form.description.trim(),
+          advantage: form.advantage.trim(),
+          scope: form.scope.trim(),
           price: parseFloat(form.price),
           priceUnit: priceUnit,
           phone: form.phone.trim(),

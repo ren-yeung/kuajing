@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
 
-  const { title, category, description, price, priceUnit, phone, tags, images } = event;
+  const { title, category, description, advantage, scope, price, priceUnit, phone, tags, images } = event;
 
   // 参数校验
   if (!title) {
@@ -24,6 +24,12 @@ exports.main = async (event, context) => {
   }
   if (!description) {
     return { success: false, errMsg: '请填写服务描述' };
+  }
+  if (!advantage) {
+    return { success: false, errMsg: '请填写服务优势' };
+  }
+  if (!scope) {
+    return { success: false, errMsg: '请填写适用范围' };
   }
   if (!price) {
     return { success: false, errMsg: '请填写服务价格' };
@@ -55,6 +61,9 @@ exports.main = async (event, context) => {
         title: title,
         category: category,
         description: description,
+        advantage: advantage,
+        scope: scope,
+        advantages: advantage ? [advantage] : [], // 兼容详情页显示
         price: parseFloat(price) || 0,
         priceUnit: priceUnit || '元',
         phone: phone || '',

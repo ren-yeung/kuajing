@@ -206,16 +206,7 @@ Page({
           }));
         }
 
-        // 如果云函数返回空数据，使用mock数据并按分类筛选
-        if (newDemands.length === 0) {
-          console.log('云函数返回空需求，使用示例数据');
-          newDemands = this.getMockDemands();
-          // 本地按分类筛选
-          if (selectedDemandCategoryId !== 0) {
-            newDemands = newDemands.filter(d => d.categoryId === selectedDemandCategoryId);
-          }
-        }
-
+        // 只使用从数据库获取的真实数据
         this.setData({
           demands: demandPage === 1 ? newDemands : demands.concat(newDemands),
           demandHasMore: newDemands.length >= 10,
@@ -225,10 +216,6 @@ Page({
       },
       fail: (err) => {
         console.error('获取需求列表失败', err);
-        // 失败时使用mock数据
-        if (this.data.demands.length === 0) {
-          this.setData({ demands: this.getMockDemands() });
-        }
         wx.stopPullDownRefresh();
       },
       complete: () => {
@@ -240,156 +227,6 @@ Page({
   // 加载更多需求
   loadMoreDemands() {
     this.loadDemands();
-  },
-
-  // 获取需求示例数据
-  getMockDemands() {
-    return [
-      {
-        id: 'mock1',
-        title: '急需美国海外仓一件代发服务',
-        description: '寻找美国加州地区的海外仓，需要提供一件代发、退货处理、FBA中转等服务，月单量500+，长期合作。',
-        userName: '陈小明',
-        avatarText: '陈',
-        avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        avatarColor: '#fff',
-        postTime: '2小时前发布',
-        tags: ['海外仓', '一件代发', '美国'],
-        categoryId: 2,  // 物流服务
-        categoryName: '物流服务',
-        budget: '¥10,000-30,000',
-        deadline: '2026-06-30',
-        views: 234,
-        applyCount: 8,
-        status: 'pending'
-      },
-      {
-        id: 'mock2',
-        title: '求推荐靠谱的欧洲VAT税务代理',
-        description: '公司在德国和法国都有VAT税号，需要找一家专业的税务代理公司，处理季度申报和税务合规问题。',
-        userName: '李华',
-        avatarText: '李',
-        avatarBg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        avatarColor: '#fff',
-        postTime: '5小时前发布',
-        tags: ['VAT申报', '欧洲', '合规'],
-        categoryId: 5,  // 合规认证
-        categoryName: '合规认证',
-        budget: '¥5,000-15,000',
-        deadline: '2026-07-15',
-        views: 156,
-        applyCount: 5,
-        status: 'pending'
-      },
-      {
-        id: 'mock3',
-        title: 'TikTok Shop店铺运营指导',
-        description: '刚入驻TikTok Shop美国站，对平台规则和运营策略不太熟悉，希望找有经验的服务商提供指导。',
-        userName: '王小美',
-        avatarText: '王',
-        avatarBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        avatarColor: '#fff',
-        postTime: '1天前发布',
-        tags: ['TikTok', '运营指导', '美国'],
-        categoryId: 8,  // 营销投流
-        categoryName: '营销投流',
-        budget: '¥3,000-8,000',
-        deadline: '2026-06-01',
-        views: 389,
-        applyCount: 12,
-        status: 'processing'
-      },
-      {
-        id: 'mock4',
-        title: '需要欧盟CE认证和RoHS检测',
-        description: '新产品准备进入欧盟市场，需要办理CE认证和RoHS检测，产品是智能穿戴设备，希望快速出证。',
-        userName: '张大伟',
-        avatarText: '张',
-        avatarBg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        avatarColor: '#fff',
-        postTime: '2天前发布',
-        tags: ['CE认证', 'RoHS', '欧盟'],
-        categoryId: 5,  // 合规认证
-        categoryName: '合规认证',
-        budget: '¥8,000-20,000',
-        deadline: '2026-08-01',
-        views: 267,
-        applyCount: 6,
-        status: 'completed'
-      },
-      {
-        id: 'mock5',
-        title: '跨境电商企业培训需求',
-        description: '公司团队需要系统性的跨境电商培训，包括平台运营、海外营销、供应链管理等内容，希望上门培训。',
-        userName: '刘洋',
-        avatarText: '刘',
-        avatarBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        avatarColor: '#fff',
-        postTime: '3天前发布',
-        tags: ['企业培训', '上门服务', '团队提升'],
-        categoryId: 6,  // 培训咨询
-        categoryName: '培训咨询',
-        budget: '¥15,000-50,000',
-        deadline: '2026-07-30',
-        views: 445,
-        applyCount: 9,
-        status: 'pending'
-      },
-      {
-        id: 'mock6',
-        title: '亚马逊店铺代运营合作',
-        description: '寻找专业亚马逊代运营团队，负责店铺日常运营、Listing优化、广告投放等工作。',
-        userName: '周伟',
-        avatarText: '周',
-        avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        avatarColor: '#fff',
-        postTime: '4小时前发布',
-        tags: ['亚马逊', '代运营', '跨境电商'],
-        categoryId: 8,  // 营销投流
-        categoryName: '营销投流',
-        budget: '¥8,000-20,000/月',
-        deadline: '2026-06-15',
-        views: 312,
-        applyCount: 7,
-        status: 'pending'
-      },
-      {
-        id: 'mock7',
-        title: '独立站建站+SEO优化方案',
-        description: '需要搭建一个面向欧美市场的独立站，要求支持多语言、多货币支付，并做好SEO优化。',
-        userName: '吴芳',
-        avatarText: '吴',
-        avatarBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        avatarColor: '#fff',
-        postTime: '1天前发布',
-        tags: ['独立站', '建站', 'SEO优化'],
-        categoryId: 7,  // 建站出海
-        categoryName: '建站出海',
-        budget: '¥20,000-50,000',
-        deadline: '2026-08-30',
-        views: 456,
-        applyCount: 11,
-        status: 'pending'
-      },
-      {
-        id: 'mock8',
-        title: '美国专线物流渠道对接',
-        description: '寻求稳定的美国专线物流渠道，需要FBA头程、海运拼箱、空运小包等多种服务。',
-        userName: '郑强',
-        avatarText: '郑',
-        avatarBg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        avatarColor: '#fff',
-        postTime: '6小时前发布',
-        tags: ['美国专线', 'FBA头程', '海运'],
-        categoryId: 2,  // 物流服务
-        categoryName: '物流服务',
-        budget: '面议',
-        deadline: '2026-07-01',
-        views: 189,
-        applyCount: 4,
-        status: 'pending'
-      }
-    ];
   },
 
   // 切换需求Tab
@@ -414,16 +251,8 @@ Page({
       demands: []
     });
 
-    // 直接从本地筛选mock数据
-    const allDemands = this.getMockDemands();
-    if (categoryId === 0) {
-      // 全部：显示所有
-      this.setData({ demands: allDemands });
-    } else {
-      // 按分类筛选
-      const filteredDemands = allDemands.filter(d => d.categoryId === categoryId);
-      this.setData({ demands: filteredDemands });
-    }
+    // 调用云函数重新加载需求数据
+    this.loadDemands();
   },
 
   // 跳转需求详情
@@ -489,42 +318,48 @@ Page({
         page: page,
         pageSize: 10
       },
-      success: (res) => {
+      success: async (res) => {
         if (res.result && res.result.success) {
-          const newServices = res.result.data.list || [];
-          const totalServices = page === 1 ? newServices : services.concat(newServices);
-
-          // 智能混合真实数据与示例数据
-          let finalServices = totalServices;
-          if (page === 1) {
-            if (totalServices.length === 0) {
-              // 没有任何真实数据，显示5个示例
-              finalServices = this.getMockServices();
-            } else if (totalServices.length <= 5) {
-              // 真实数据 ≤ 5条，补充示例凑满5条
-              finalServices = this.fillMockServices(totalServices);
+          let newServices = res.result.data.list || [];
+          
+          // 前端强制转换所有 cloud:// 头像为临时链接，并截断描述为15字
+          for (let i = 0; i < newServices.length; i++) {
+            const service = newServices[i];
+            if (service.avatar && service.avatar.startsWith('cloud://')) {
+              try {
+                const urlRes = await wx.cloud.getTempFileURL({ fileList: [service.avatar] });
+                if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+                  newServices[i].avatar = urlRes.fileList[0].tempFileURL;
+                }
+              } catch (e) {
+                console.log('服务头像转换失败:', e);
+              }
             }
-            // 真实数据 > 5条，只显示真实数据
+            // 截断描述为15字
+            if (service.description) {
+              newServices[i].desc = service.description.length > 15 
+                ? service.description.substring(0, 15) + '...' 
+                : service.description;
+            }
           }
-
+          
           this.setData({
-            services: finalServices,
+            services: page === 1 ? newServices : services.concat(newServices),
             hasMore: newServices.length >= 10,
             page: page + 1
           });
         } else {
-          // 如果云函数返回空或失败，使用示例数据
+          // 如果云函数返回空或失败，显示空列表
           this.setData({
-            services: this.getMockServices()
+            services: []
           });
         }
         wx.stopPullDownRefresh();
       },
       fail: (err) => {
         console.error('获取服务列表失败', err);
-        // 使用示例数据作为降级方案
         this.setData({
-          services: this.getMockServices()
+          services: []
         });
         wx.stopPullDownRefresh();
       },
@@ -534,149 +369,19 @@ Page({
     });
   },
 
-  // 获取示例数据（降级方案）
-  getMockServices() {
-    return [
-      {
-        id: 'mock1',
-        title: '美国专线小包物流服务',
-        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        provider: '张三物流',
-        avatarText: '张',
-        avatarBg: '#E6F1FB',
-        avatarColor: '#185FA5',
-        rating: '4.8',
-        desc: '专业美国专线，时效稳定，服务优质',
-        likes: 234,
-        views: '1.2k',
-        categoryId: 2,
-        categoryName: '物流服务',
-        isMock: true
-      },
-      {
-        id: 'mock2',
-        title: '跨境支付结汇一站式服务',
-        gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        provider: '李四支付',
-        avatarText: '李',
-        avatarBg: '#FAEEDA',
-        avatarColor: '#854F0B',
-        rating: '4.9',
-        desc: '合规结汇，费率低，到账快',
-        likes: 567,
-        views: '3.4k',
-        categoryId: 4,
-        categoryName: '支付结算',
-        isMock: true
-      },
-      {
-        id: 'mock3',
-        title: '欧盟CE认证快速办理',
-        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        provider: '王五认证',
-        avatarText: '王',
-        avatarBg: '#EAF3DE',
-        avatarColor: '#3B6D11',
-        rating: '4.7',
-        desc: '专业团队，快速通过，服务透明',
-        likes: 189,
-        views: '856',
-        categoryId: 5,
-        categoryName: '合规认证',
-        isMock: true
-      },
-      {
-        id: 'mock4',
-        title: '亚马逊店铺代运营服务',
-        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        provider: '赵六运营',
-        avatarText: '赵',
-        avatarBg: '#FCE4EC',
-        avatarColor: '#AD1457',
-        rating: '4.6',
-        desc: '专业运营团队，提升销量，省心省力',
-        likes: 312,
-        views: '2.1k',
-        categoryId: 8,
-        categoryName: '营销投流',
-        isMock: true
-      },
-      {
-        id: 'mock5',
-        title: '独立站搭建一站式服务',
-        gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-        provider: '钱七建站',
-        avatarText: '钱',
-        avatarBg: '#E0F7FA',
-        avatarColor: '#006064',
-        rating: '4.9',
-        desc: '精品模板，快速上线，SEO优化',
-        likes: 456,
-        views: '2.8k',
-        categoryId: 7,
-        categoryName: '建站出海',
-        isMock: true
-      },
-      {
-        id: 'mock6',
-        title: '亚马逊店铺代运营服务',
-        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        provider: '赵六运营',
-        avatarText: '赵',
-        avatarBg: '#FCE4EC',
-        avatarColor: '#AD1457',
-        rating: '4.6',
-        desc: '专业运营团队，提升销量，省心省力',
-        likes: 312,
-        views: '2.1k',
-        categoryId: 8,
-        categoryName: '营销投流',
-        isMock: true
-      },
-      {
-        id: 'mock7',
-        title: '亚马逊店铺代运营服务',
-        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        provider: '赵六运营',
-        avatarText: '赵',
-        avatarBg: '#FCE4EC',
-        avatarColor: '#AD1457',
-        rating: '4.6',
-        desc: '专业运营团队，提升销量，省心省力',
-        likes: 312,
-        views: '2.1k',
-        categoryId: 8,
-        categoryName: '营销投流',
-        isMock: true
-      }
-    ];
-  },
-
-  // 补充示例数据到5条
-  fillMockServices(realServices) {
-    const mockServices = this.getMockServices();
-    const fillCount = 5 - realServices.length;
-    if (fillCount <= 0) return realServices;
-
-    // 从示例数据中取需要的数量补充
-    const fillServices = mockServices.slice(0, fillCount);
-    return [...realServices, ...fillServices];
-  },
-
   // 根据分类ID获取分类名称
   getCategoryName(categoryId) {
-    if (!categoryId) return '';
+    if (!categoryId || categoryId === 1) return '';  // id=1是"全部"，返回空字符串表示全部
     const categoryMap = {
-      1: '跨境网络',
-      2: '物流服务',
-      3: '报关清关',
-      4: '支付结算',
-      5: '合规认证',
-      6: '培训咨询',
-      7: '建站出海',
-      8: '营销投流',
-      9: '选品特供',
-      10: '更多'
+      2: '跨境网络',
+      3: '物流服务',
+      4: '报关清关',
+      5: '支付结算',
+      6: '合规认证',
+      7: '培训咨询',
+      8: '建站出海',
+      9: '营销投流',
+      10: '选品特供'
     };
     return categoryMap[categoryId] || '';
   },
@@ -774,9 +479,31 @@ Page({
         pageSize: 10,
         isMyService: true // 标识获取商家自己的服务
       },
-      success: (res) => {
+      success: async (res) => {
         if (res.result && res.result.success) {
-          const newServices = res.result.data.list || [];
+          let newServices = res.result.data.list || [];
+          
+          // 前端强制转换所有 cloud:// 头像为临时链接
+          for (let i = 0; i < newServices.length; i++) {
+            const service = newServices[i];
+            if (service.avatar && service.avatar.startsWith('cloud://')) {
+              try {
+                const urlRes = await wx.cloud.getTempFileURL({ fileList: [service.avatar] });
+                if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+                  newServices[i].avatar = urlRes.fileList[0].tempFileURL;
+                }
+              } catch (e) {
+                console.log('商家服务头像转换失败:', e);
+              }
+            }
+            // 截断描述为15字
+            if (service.description) {
+              newServices[i].desc = service.description.length > 15
+                ? service.description.substring(0, 15) + '...'
+                : service.description;
+            }
+          }
+          
           this.setData({
             merchantServices: merchantPage === 1 ? newServices : merchantServices.concat(newServices),
             merchantHasMore: newServices.length >= 10,
@@ -807,16 +534,8 @@ Page({
       services: []
     });
 
-    // 直接从本地筛选mock数据
-    const allServices = this.getMockServices();
-    if (categoryId === 1) {
-      // 全部：显示所有
-      this.setData({ services: allServices });
-    } else {
-      // 按分类筛选（需要将id减1来匹配服务数据的categoryId）
-      const filteredServices = allServices.filter(s => s.categoryId === categoryId - 1);
-      this.setData({ services: filteredServices });
-    }
+    // 重新调用云函数加载数据
+    this.loadServices();
   },
 
   // 查看更多

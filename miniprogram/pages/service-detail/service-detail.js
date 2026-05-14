@@ -19,7 +19,7 @@ Page({
   },
 
   // 加载服务详情
-  loadServiceDetail(serviceId) {
+  async loadServiceDetail(serviceId) {
     this.setData({ isLoading: true });
 
     // 如果是示例数据ID，使用本地数据
@@ -36,46 +36,84 @@ Page({
     }
 
     // 调用云函数获取真实数据
-    wx.cloud.callFunction({
-      name: 'getServiceDetail',
-      data: { serviceId },
-      success: (res) => {
-        if (res.result && res.result.success) {
-          const data = res.result.data;
-          // 格式化数据
-          const service = this.formatServiceData(data);
-          this.setData({
-            service,
-            likeCount: service.likes
-          });
-        } else {
-          // 云函数返回失败，尝试本地数据
-          const mockService = this.getMockService(serviceId);
-          if (mockService) {
-            this.setData({ service: mockService, likeCount: mockService.likes });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getServiceDetail',
+        data: { serviceId }
+      });
+      
+      if (res.result && res.result.success && res.result.data) {
+        const data = res.result.data;
+        
+        // 处理商家头像
+        const merchant = data.merchant || {};
+        let avatar = merchant.avatar || '';
+        
+        // 如果是云存储 fileID，前端转换为临时链接
+        if (avatar && avatar.startsWith('cloud://')) {
+          try {
+            const urlRes = await wx.cloud.getTempFileURL({ fileList: [avatar] });
+            if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+              avatar = urlRes.fileList[0].tempFileURL;
+            } else {
+              avatar = '';
+            }
+          } catch (e) {
+            avatar = '';
           }
         }
-      },
-      fail: (err) => {
-        console.error('获取服务详情失败', err);
-        // 降级使用本地数据
+        
+        // 格式化数据
+        const service = this.formatServiceData(data, avatar);
+        this.setData({
+          service,
+          likeCount: service.likes
+        });
+      } else {
+        // 云函数返回失败，尝试本地数据
         const mockService = this.getMockService(serviceId);
         if (mockService) {
           this.setData({ service: mockService, likeCount: mockService.likes });
         }
-      },
-      complete: () => {
-        this.setData({ isLoading: false });
       }
-    });
+    } catch (err) {
+      console.error('获取服务详情失败', err);
+      // 降级使用本地数据
+      const mockService = this.getMockService(serviceId);
+      if (mockService) {
+        this.setData({ service: mockService, likeCount: mockService.likes });
+      }
+    }
+    
+    this.setData({ isLoading: false });
   },
 
   // 格式化云函数返回的数据
-  formatServiceData(data) {
+  formatServiceData(data, avatar) {
     const merchant = data.merchant || {};
-    const avatarText = merchant.nickname ? merchant.nickname.charAt(0) : '?';
-    const avatarBg = '#E6F1FB';
-    const avatarColor = '#185FA5';
+    const nickName = merchant.nickname || '匿名商家';
+    const avatarText = nickName.charAt(0);
+    const avatarBg = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    const avatarColor = '#fff';
+
+    // 处理图片列表（兼容对象数组和字符串数组）
+    let images = [];
+    if (data.images && Array.isArray(data.images)) {
+      images = data.images.map(img => {
+        if (typeof img === 'string') {
+          return { url: img };
+        }
+        return { url: img.url || img };
+      });
+    }
+
+    // 处理服务优势（兼容 advantages 数组和 advantage 单数字段）
+    let advantages = [];
+    if (data.advantages && Array.isArray(data.advantages) && data.advantages.length > 0) {
+      advantages = data.advantages;
+    } else if (data.advantage) {
+      advantages = [data.advantage];
+    }
 
     return {
       id: data.id,
@@ -85,9 +123,11 @@ Page({
       price: data.price,
       priceUnit: data.priceUnit || '元',
       phone: data.phone || '',
+      images: images,
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       provider: {
-        name: merchant.nickname || '匿名商家',
+        name: nickName,
+        avatar: avatar,
         avatarText: avatarText,
         avatarBg: avatarBg,
         avatarColor: avatarColor,
@@ -98,14 +138,9 @@ Page({
       views: data.views || 0,
       sold: Math.floor(Math.random() * 100) + 10,
       desc: data.description,
-      advantages: [
-        '专业服务，品质保障',
-        '一对一咨询，响应及时',
-        '价格透明，无隐藏费用',
-        '售后跟踪，服务完善'
-      ],
-      scope: '跨境电商、外贸企业等',
-      tags: data.category ? [data.category] : ['优质服务'],
+      advantages: advantages,
+      scope: data.scope || '',
+      tags: data.tags || (data.category ? [data.category] : ['优质服务']),
       reviews: (data.reviews || []).map(r => ({
         avatar: r.userName ? r.userName.charAt(0) : '?',
         name: r.userName || '匿名用户',

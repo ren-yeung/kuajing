@@ -30,45 +30,50 @@ exports.main = async (event, context) => {
     }
 
     const demand = demandResult.data;
+    const newViews = (demand.views || 0) + 1;
 
-    // 更新浏览量
-    await db.collection('demands').doc(demandId).update({
-      data: {
-        views: (demand.views || 0) + 1
-      }
-    });
+    // 异步更新浏览量（不等待）
+    db.collection('demands').doc(demandId).update({
+      data: { views: newViews }
+    }).catch(() => {});
 
-    // 查询发布者信息
-    let publisherInfo = null;
-    try {
-      const userResult = await db.collection('users').doc(demand.userId).get();
-      if (userResult.data) {
-        publisherInfo = {
-          userId: userResult.data._id,
-          nickname: userResult.data.nickname,
-          avatar: userResult.data.avatar || '',
-          createTime: userResult.data.createTime
-        };
+    // 获取用户信息（优先用 demand 中保存的，否则从 users 集合查询）
+    let nickname = demand.nickname;
+    let avatar = demand.avatar;
+    
+    if (!nickname || !avatar) {
+      try {
+        const userResult = await db.collection('users').doc(demand.userId).get();
+        if (userResult.data) {
+          nickname = nickname || userResult.data.nickname || '匿名用户';
+          avatar = avatar || userResult.data.avatar || '';
+        } else {
+          nickname = nickname || '匿名用户';
+        }
+      } catch (e) {
+        nickname = nickname || '匿名用户';
       }
-    } catch (e) {
-      // 用户信息查询失败，继续
     }
 
-    // 查询相似需求
-    let similarDemands = [];
-    try {
-      const similarResult = await db.collection('demands')
-        .where({
-          category: demand.category,
-          status: 'open',
-          _id: db.command.neq(demandId)
-        })
-        .limit(5)
-        .get();
-      similarDemands = similarResult.data || [];
-    } catch (e) {
-      // 相似需求查询失败，继续
+    // 如果 avatar 是云存储 fileID，转换为临时链接
+    if (avatar && avatar.startsWith('cloud://')) {
+      try {
+        const tempFileURL = await cloud.getTempFileURL({
+          fileList: [avatar]
+        });
+        if (tempFileURL.fileList && tempFileURL.fileList[0] && tempFileURL.fileList[0].tempFileURL) {
+          avatar = tempFileURL.fileList[0].tempFileURL;
+        }
+      } catch (e) {
+        console.error('获取头像临时链接失败', e);
+      }
     }
+
+    const publisherInfo = {
+      userId: demand.userId,
+      nickname: nickname,
+      avatar: avatar
+    };
 
     return {
       success: true,
@@ -82,10 +87,13 @@ exports.main = async (event, context) => {
         deadline: demand.deadline || '',
         images: demand.images || [],
         publisher: publisherInfo,
-        views: (demand.views || 0) + 1,
+        views: newViews,
         contactCount: demand.contactCount || 0,
-        similarDemands: similarDemands,
-        createTime: demand.createTime
+        createTime: demand.createTime,
+        tags: demand.tags || [],
+        region: demand.region || '',
+        status: demand.status || 'open',
+        applyCount: demand.applyCount || 0
       }
     };
 

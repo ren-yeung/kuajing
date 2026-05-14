@@ -61,9 +61,34 @@
     />
   </view>
 
+  <!-- 服务优势 -->
+  <view class="form-group">
+    <text class="form-label required">服务优势</text>
+    <textarea
+      class="form-textarea-mini"
+      placeholder="请描述您的服务优势，如：专业团队、高效服务等"
+      value="{{form.advantage}}"
+      bindinput="onInput"
+      data-field="advantage"
+    />
+  </view>
+
+  <!-- 适用范围 -->
+  <view class="form-group">
+    <text class="form-label required">适用范围</text>
+    <input
+      class="form-input"
+      maxlength="15"
+      placeholder="请输入适用范围，例如：跨境电商"
+      value="{{form.scope}}"
+      bindinput="onInput"
+      data-field="scope"
+    />
+  </view>
+
   <!-- 服务图片 -->
   <view class="form-group">
-    <text class="form-label">服务图片</text>
+    <text class="form-label required">服务图片</text>
     <view class="image-upload-area">
       <view
         class="image-preview {{item.isMain ? 'main-image' : ''}}"
@@ -76,17 +101,17 @@
         <view class="image-delete" catchtap="deleteImage" data-index="{{index}}">×</view>
         <text class="main-tag" wx:if="{{item.isMain}}">封面</text>
       </view>
-      <view class="image-upload-box" bindtap="chooseImage" wx:if="{{form.images.length < 9}}">
+      <view class="image-upload-box" bindtap="chooseImage" wx:if="{{form.images.length < 6}}">
         <text class="upload-icon">+</text>
         <text class="upload-text">上传图片</text>
       </view>
     </view>
-    <text class="upload-tip">最多上传9张图片，第一张为封面图</text>
+    <text class="upload-tip">最少上传1张，最多上传6张图片，第一张为封面图</text>
   </view>
 
   <!-- 服务标签 -->
   <view class="form-group tag-section">
-    <text class="form-label">服务标签</text>
+    <text class="form-label required">服务标签</text>
     <view class="tag-list">
       <view
         class="tag-option {{selectedTags.indexOf(item) !== -1 ? 'tag-selected' : ''}}"

@@ -63,7 +63,7 @@
 
   <!-- 预算范围 -->
   <view class="form-group">
-    <text class="form-label">预算范围</text>
+    <text class="form-label required">预算范围</text>
     <view class="budget-row">
       <input
         class="form-input budget-input"
@@ -87,16 +87,28 @@
 
   <!-- 需求标签 -->
   <view class="form-group">
-    <text class="form-label">需求标签（最多3个）</text>
-    <view class="tag-list">
-      <view
-        class="tag-item {{selectedTags.indexOf(item) > -1 ? 'tag-selected' : ''}}"
-        wx:for="{{tags}}"
-        wx:key="*this"
-        bindtap="toggleTag"
-        data-tag="{{item}}"
-      >{{item}}</view>
+    <text class="form-label required">需求标签</text>
+    <view class="tag-input-row">
+      <input
+        class="form-input tag-input"
+        placeholder="输入标签"
+        value="{{tagInput}}"
+        bindinput="onTagInput"
+        maxlength="4"
+      />
+      <view class="add-tag-btn" bindtap="addTag">添加</view>
     </view>
+    <view class="tag-list" wx:if="{{selectedTags.length > 0}}">
+      <view
+        class="tag-item tag-selected"
+        wx:for="{{selectedTags}}"
+        wx:key="*this"
+      >
+        {{item}}
+        <text class="tag-delete" bindtap="removeTag" data-index="{{index}}">×</text>
+      </view>
+    </view>
+    <text class="form-hint" wx:if="{{selectedTags.length === 0}}">最多添加4个标签，每个标签不超过4个字</text>
   </view>
 
   <!-- 截止日期 -->

@@ -107,6 +107,23 @@ page {
   color: #999;
 }
 
+/* 服务优势输入框（减少50%，从80rpx改为40rpx） */
+.form-textarea-mini {
+  width: 100%;
+  padding: 12rpx 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: white;
+  min-height: 40rpx;
+  box-sizing: border-box;
+}
+
+.form-textarea-mini::placeholder {
+  color: #999;
+}
+
 /* ========== 分类选择 ========== */
 .category-grid {
   display: grid;

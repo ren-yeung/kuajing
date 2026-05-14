@@ -18,7 +18,7 @@ Page({
       phone: '',
       region: ''
     },
-    tags: ['时效快', '价格低', '覆盖广', '服务好', '可追踪', '包清关', '专线物流', '小包服务'],
+    tagInput: '',
     selectedTags: [],
     isSubmitting: false
   },
@@ -78,20 +78,50 @@ Page({
     });
   },
 
-  // 切换标签选择
-  toggleTag(e) {
-    const tag = e.currentTarget.dataset.tag;
-    const { selectedTags } = this.data;
-    const index = selectedTags.indexOf(tag);
-    if (index > -1) {
-      selectedTags.splice(index, 1);
-    } else {
-      if (selectedTags.length >= 3) {
-        wx.showToast({ title: '最多选择3个标签', icon: 'none' });
-        return;
-      }
-      selectedTags.push(tag);
+  // 标签输入
+  onTagInput(e) {
+    this.setData({
+      tagInput: e.detail.value
+    });
+  },
+
+  // 添加标签
+  addTag() {
+    const { tagInput, selectedTags } = this.data;
+    const tag = tagInput.trim();
+    
+    if (!tag) {
+      wx.showToast({ title: '请输入标签内容', icon: 'none' });
+      return;
     }
+    
+    if (tag.length > 4) {
+      wx.showToast({ title: '标签最多4个字', icon: 'none' });
+      return;
+    }
+    
+    if (selectedTags.length >= 4) {
+      wx.showToast({ title: '最多添加4个标签', icon: 'none' });
+      return;
+    }
+    
+    if (selectedTags.includes(tag)) {
+      wx.showToast({ title: '该标签已添加', icon: 'none' });
+      return;
+    }
+    
+    selectedTags.push(tag);
+    this.setData({
+      selectedTags: [...selectedTags],
+      tagInput: ''
+    });
+  },
+
+  // 删除标签
+  removeTag(e) {
+    const index = e.currentTarget.dataset.index;
+    const { selectedTags } = this.data;
+    selectedTags.splice(index, 1);
     this.setData({ selectedTags: [...selectedTags] });
   },
 
@@ -108,6 +138,16 @@ Page({
     }
     if (!form.description.trim()) {
       wx.showToast({ title: '请输入需求描述', icon: 'none' });
+      return;
+    }
+    // 验证预算范围（最低价和最高价至少填写一个）
+    if (!form.budgetMin.trim() && !form.budgetMax.trim()) {
+      wx.showToast({ title: '请填写预算范围', icon: 'none' });
+      return;
+    }
+    // 验证需求标签（至少添加1个标签）
+    if (selectedTags.length === 0) {
+      wx.showToast({ title: '请至少添加1个需求标签', icon: 'none' });
       return;
     }
 

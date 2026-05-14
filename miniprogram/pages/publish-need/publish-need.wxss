@@ -146,15 +146,41 @@ page {
   font-size: 28rpx;
 }
 
-/* 标签选择 */
+/* 标签输入 */
+.tag-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.tag-input {
+  flex: 1;
+}
+
+.add-tag-btn {
+  padding: 16rpx 32rpx;
+  background: #07C160;
+  color: white;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+}
+
+.tag-delete {
+  margin-left: 8rpx;
+  font-size: 32rpx;
+  color: #07C160;
+}
+
+/* 标签样式 */
 .tag-list {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
+  margin-top: 16rpx;
 }
 
 .tag-item {
-  padding: 12rpx 28rpx;
+  padding: 12rpx 24rpx;
   border: 1rpx solid #e0e0e0;
   border-radius: 32rpx;
   font-size: 26rpx;
@@ -166,6 +192,12 @@ page {
   background: rgba(7, 193, 96, 0.1);
   border-color: #07C160;
   color: #07C160;
+}
+
+.form-hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
 }
 
 /* 日期选择器 */

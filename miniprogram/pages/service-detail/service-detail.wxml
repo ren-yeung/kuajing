@@ -13,8 +13,13 @@
     </view>
   </view>
 
-  <!-- 服务图片 -->
-  <view class="service-image" style="background: {{service.gradient}};">
+  <!-- 服务封面图片（支持多张轮播） -->
+  <swiper class="service-swiper" wx:if="{{service.images && service.images.length > 0}}" indicator-dots="{{service.images.length > 1}}" autoplay="{{service.images.length > 1}}" interval="3000" circular>
+    <swiper-item wx:for="{{service.images}}" wx:key="index">
+      <image src="{{item.url}}" mode="aspectFill" class="service-image"></image>
+    </swiper-item>
+  </swiper>
+  <view wx:else class="service-image-placeholder">
     <text>服务封面图片</text>
   </view>
 
@@ -46,7 +51,8 @@
 
     <!-- 商家信息 -->
     <view class="merchant-section">
-      <view class="merchant-avatar" style="background: {{service.provider.avatarBg}}; color: {{service.provider.avatarColor}};">
+      <image wx:if="{{service.provider.avatar}}" src="{{service.provider.avatar}}" mode="aspectFill" class="merchant-avatar-img"></image>
+      <view wx:else class="merchant-avatar" style="background: {{service.provider.avatarBg}}; color: {{service.provider.avatarColor}};">
         {{service.provider.avatarText}}
       </view>
       <view class="merchant-info">
@@ -69,12 +75,16 @@
         <view style="height: 24rpx;"></view>
         <text style="font-weight: 600;">服务优势：</text>
         <view style="height: 12rpx;"></view>
-        <block wx:for="{{service.advantages}}" wx:key="index">
-          <text>{{index + 1}}. {{item}}</text>
+        <block wx:if="{{service.advantages.length > 0}}">
+          <text wx:for="{{service.advantages}}" wx:key="index">{{item}}</text>
+        </block>
+        <block wx:else>
+          <text style="color:#999;">暂未填写服务优势</text>
         </block>
         <view style="height: 24rpx;"></view>
         <text style="font-weight: 600;">适用范围：</text>
-        <text>{{service.scope}}</text>
+        <text wx:if="{{service.scope}}">{{service.scope}}</text>
+        <text wx:else style="color:#999;">暂未填写适用范围</text>
       </view>
       <view class="detail-tags">
         <text class="detail-tag" wx:for="{{service.tags}}" wx:key="index">{{item}}</text>

@@ -66,18 +66,18 @@
   <block wx:if="{{currentRole !== 'merchant'}}">
     <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
       <view class="card-inner">
-        <view class="service-image" style="background: {{item.gradient}};">
-          <text>服务图片</text>
-        </view>
+        <image wx:if="{{item.images && item.images.length > 0}}" src="{{item.images[0].url}}" mode="aspectFill" class="service-image"></image>
+        <view wx:else class="service-image-placeholder">服务图片</view>
         <view class="service-info">
           <!-- 第一行：服务商信息 + 分类标签 -->
           <view class="service-info-header">
             <view class="service-provider">
-              <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+              <image wx:if="{{item.avatar && item.avatar !== ''}}" src="{{item.avatar}}" mode="aspectFill" class="provider-avatar-img"></image>
+              <view wx:else class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
               <text class="provider-name">{{item.provider}}</text>
               <text class="provider-rating">⭐ {{item.rating}}</text>
             </view>
-            <text class="category-tag active" wx:if="{{item.categoryName}}">{{item.categoryName}}</text>
+            <text class="category-tag active" wx:if="{{item.category}}">{{item.category}}</text>
           </view>
           <!-- 标题 -->
           <text class="service-title">{{item.title}}</text>
@@ -142,13 +142,13 @@
     <block wx:if="{{merchantActiveTab === 'my'}}">
       <view class="service-card" wx:for="{{merchantServices}}" wx:key="id" bindtap="goServiceDetail" data-id="{{item.id}}">
         <view class="card-inner">
-          <view class="service-image" style="background: {{item.gradient}};">
-            <text>服务图片</text>
-          </view>
+          <image wx:if="{{item.images && item.images.length > 0}}" src="{{item.images[0].url}}" mode="aspectFill" class="service-image"></image>
+          <view wx:else class="service-image-placeholder">服务图片</view>
           <view class="service-info">
             <text class="service-title">{{item.title}}</text>
             <view class="service-provider">
-              <view class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
+              <image wx:if="{{item.avatar && item.avatar !== ''}}" src="{{item.avatar}}" mode="aspectFill" class="provider-avatar-img"></image>
+              <view wx:else class="provider-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">{{item.avatarText}}</view>
               <text class="provider-name">{{item.provider}}</text>
               <text class="provider-rating">⭐ {{item.rating}}</text>
             </view>

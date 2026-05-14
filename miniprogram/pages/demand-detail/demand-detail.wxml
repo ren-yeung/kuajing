@@ -1,0 +1,134 @@
+<!--demand-detail.wxml-->
+<view class="page">
+  <!-- 加载中提示 -->
+  <view class="loading-cover" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 导航栏 -->
+  <view class="nav-bar">
+    <view class="nav-content">
+      <view class="nav-back" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+        <text class="back-text">返回</text>
+      </view>
+      <text class="nav-title">需求详情</text>
+      <view class="nav-right-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- 占位：顶出导航栏高度 -->
+  <view style="height: {{navHeight}}px;"></view>
+
+  <!-- 可滚动内容 -->
+  <scroll-view class="content-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- 需求信息卡片 -->
+    <view class="demand-info-card">
+      <!-- 状态 + 分类 -->
+      <view class="demand-header">
+        <view class="demand-status" style="background: {{demand.statusBg}}; color: {{demand.statusColor}};">
+          {{demand.status}}
+        </view>
+        <view class="demand-category selected">{{demand.category}}</view>
+      </view>
+
+      <!-- 标题 -->
+      <text class="demand-title">{{demand.title}}</text>
+
+      <!-- 预算 + 截止日期 -->
+      <view class="demand-budget-row">
+        <view class="budget-info">
+          <text class="budget-label">预算：</text>
+          <text class="budget-amount">{{demand.budget}}</text>
+        </view>
+        <text class="deadline">截止：{{demand.deadline}}</text>
+      </view>
+    </view>
+
+    <!-- 浏览/报名统计 -->
+    <view class="stats-row">
+      <text class="stat-item">👁️ {{demand.views}}人浏览</text>
+      <text class="stat-item">📝 {{demand.applyCount}}人报名</text>
+    </view>
+
+    <!-- 发布者信息 -->
+    <view class="user-section">
+      <image wx:if="{{demand.userAvatar}}" src="{{demand.userAvatar}}" mode="aspectFill" class="user-avatar-img"></image>
+      <view wx:else class="user-avatar-text" style="background: {{demand.userAvatarBg}}; color: {{demand.userAvatarColor}};">
+        {{demand.userAvatarText}}
+      </view>
+      <view class="user-info">
+        <view class="user-name">{{demand.userName}}</view>
+        <text class="post-time">发布于 {{demand.postTime}}</text>
+      </view>
+    </view>
+
+    <!-- 需求详情 -->
+    <view class="detail-section">
+      <view class="detail-title-row">
+        <text class="section-title">需求详情</text>
+      </view>
+      <view class="detail-text">
+        <text>{{demand.description}}</text>
+      </view>
+      <!-- 需求标签 -->
+      <view class="detail-tags" wx:if="{{demand.tags && demand.tags.length > 0}}">
+        <text class="detail-tag" wx:for="{{demand.tags}}" wx:key="index">{{item}}</text>
+      </view>
+      <!-- 需求地区 -->
+      <view class="region-item" wx:if="{{demand.region}}">
+        <text class="region-icon">📍</text>
+        <text class="region-text">需求地区：{{demand.region}}</text>
+      </view>
+    </view>
+
+    <!-- 报名商家列表 -->
+    <view class="merchants-section">
+      <view class="section-header">
+        <text class="section-title">报名商家 ({{demand.merchants.length}})</text>
+        <text class="more-link" wx:if="{{demand.merchants.length > 3}}">查看全部 ></text>
+      </view>
+
+      <view class="merchant-card" wx:for="{{demand.merchants}}" wx:key="id">
+        <view class="merchant-avatar" style="background: {{item.avatarBg}}; color: {{item.avatarColor}};">
+          {{item.avatarText}}
+        </view>
+        <view class="merchant-info">
+          <view class="merchant-name">
+            {{item.name}}
+            <text class="verified-badge" wx:if="{{item.verified}}">已认证</text>
+          </view>
+          <view class="merchant-rating">⭐ {{item.rating}} | 已成交 {{item.soldCount}}</view>
+          <text class="merchant-desc">{{item.description}}</text>
+        </view>
+        <view class="merchant-arrow" bindtap="contactMerchant" data-id="{{item.id}}">›</view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-merchants" wx:if="{{demand.merchants.length === 0}}">
+        <text>暂无商家报名</text>
+      </view>
+    </view>
+
+    <!-- 底部安全距离 -->
+    <view style="height: 180rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bottom-left">
+      <view class="bottom-action" bindtap="collectDemand">
+        <text class="bottom-action-icon">{{isCollected ? '❤️' : '🔖'}}</text>
+        <text class="bottom-action-text">{{isCollected ? '已收藏' : '收藏'}}</text>
+      </view>
+      <view class="bottom-action" bindtap="shareDemand">
+        <text class="bottom-action-icon">🔗</text>
+        <text class="bottom-action-text">分享</text>
+      </view>
+    </view>
+    <view class="apply-btn-bar {{hasApplied ? 'applied' : ''}}" bindtap="applyDemand">
+      {{hasApplied ? '已报名' : '立即报名'}}
+    </view>
+  </view>
+</view>
