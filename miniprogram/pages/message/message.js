@@ -7,98 +7,7 @@ Page({
     bottomSafeHeight: 0,
     tabBarOuterHeight: 58,
     isAdmin: false,
-    messages: [
-      {
-        id: 1,
-        name: '张三物流',
-        avatarText: '张',
-        avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        time: '上午 10:30',
-        preview: '您好，美国专线的价格已经发给您了...',
-        unread: 3
-      },
-      {
-        id: 2,
-        name: '李四支付',
-        avatarText: '李',
-        avatarBg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        time: '昨天',
-        preview: '跨境支付结汇的费率可以再优惠...',
-        unread: 1
-      },
-      {
-        id: 3,
-        name: '王五认证',
-        avatarText: '王',
-        avatarBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        time: '周一',
-        preview: '欧盟CE认证的资料已经收到，正在...',
-        unread: 0
-      },
-      {
-        id: 4,
-        name: '赵六仓储',
-        avatarText: '赵',
-        avatarBg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        time: '上周',
-        preview: '海外仓的租金下个月会调整...',
-        unread: 0
-      },
-      {
-        id: 5,
-        name: '孙七营销',
-        avatarText: '孙',
-        avatarBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        time: '上周',
-        preview: 'TikTok广告投放的方案已经做好了...',
-        unread: 0
-      },
-      {
-        id: 6,
-        name: '周八培训',
-        avatarText: '周',
-        avatarBg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-        time: '上周',
-        preview: '跨境电商培训的下期课程安排...',
-        unread: 0
-      },
-      {
-        id: 7,
-        name: '吴九法务',
-        avatarText: '吴',
-        avatarBg: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-        time: '上上周',
-        preview: '您的商标注册申请已经提交...',
-        unread: 2
-      },
-      {
-        id: 8,
-        name: '郑十税务',
-        avatarText: '郑',
-        avatarBg: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
-        time: '3天前',
-        preview: '跨境税务筹划方案已经发送...',
-        unread: 0
-      },
-      {
-        id: 9,
-        name: '褚十三设计',
-        avatarText: '褚',
-        avatarBg: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
-        time: '6天前',
-        preview: '品牌LOGO和包装设计初稿已出...',
-        unread: 1
-      },
-      {
-        id: 10,
-        name: '蒋十五IT服务',
-        avatarText: '蒋',
-        avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        time: '一周前',
-        preview: '跨境电商ERP系统对接完成...',
-        unread: 0
-      }
-    ]
+    messages: []
   },
 
   onLoad() {
@@ -149,6 +58,32 @@ Page({
     this.setData({
       isAdmin: !!(userInfo && userInfo.isAdmin)
     });
+
+    // 加载聊天记录
+    this.loadChats();
+  },
+
+  // 加载聊天记录
+  loadChats() {
+    // 先检查登录状态
+    if (!login.checkLogin()) {
+      this.setData({ messages: [] });
+      return;
+    }
+
+    wx.cloud.callFunction({
+      name: 'getChats',
+      success: res => {
+        if (res.result && res.result.success) {
+          this.setData({
+            messages: res.result.data.chats || []
+          });
+        }
+      },
+      fail: err => {
+        console.error('加载聊天记录失败', err);
+      }
+    });
   },
 
   // 切换管理员身份
@@ -181,10 +116,13 @@ Page({
     });
   },
 
+  // 进入聊天页面
   goChat(e) {
-    var id = e.currentTarget.dataset.id;
+    var chatId = e.currentTarget.dataset.id;
+    var serviceId = e.currentTarget.dataset.serviceid;
+    var serviceTitle = e.currentTarget.dataset.servicetitle || '';
     wx.navigateTo({
-      url: '/pages/chat/chat?id=' + id
+      url: `/pages/chat/chat?chatId=${chatId}&serviceId=${serviceId}&serviceName=${encodeURIComponent(serviceTitle)}`
     });
   }
 });

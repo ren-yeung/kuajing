@@ -671,8 +671,8 @@ Page({
     ];
     var avatarBg = avatarBgs[userInfo.userId ? userInfo.userId.charCodeAt(0) % avatarBgs.length : 0];
 
-    // 使用独立的商家头像 merchantAvatar
-    var avatarUrl = userInfo.merchantAvatar || userInfo.avatar || '';
+    // 只使用独立的商家头像 merchantAvatar，完全隔离用户头像
+    var avatarUrl = userInfo.merchantAvatar || '';
     if (avatarUrl && avatarUrl.startsWith('cloud://')) {
       wx.cloud.getTempFileURL({
         fileList: [avatarUrl],

@@ -45,9 +45,8 @@ exports.main = async (event, context) => {
     try {
       const merchantResult = await db.collection('users').doc(service.userId).get();
       if (merchantResult.data) {
-        // 优先用 users 集合的头像
-        const userAvatar = merchantResult.data.avatar || '';
-        merchantAvatar = userAvatar || merchantAvatar;
+        // 只使用商家头像，完全隔离用户头像
+        // merchantAvatar 已经在前面赋值为 service.merchantAvatar
         
         // 如果是云存储 fileID，转换为临时链接
         if (merchantAvatar && merchantAvatar.startsWith('cloud://')) {

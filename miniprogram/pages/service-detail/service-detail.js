@@ -390,7 +390,7 @@ Page({
       return;
     }
     wx.navigateTo({
-      url: `/pages/chat/chat?id=${this.data.serviceId}`
+      url: `/pages/chat/chat?serviceId=${this.data.serviceId}&serviceName=${encodeURIComponent(this.data.service.title)}`
     });
   },
 
@@ -402,7 +402,7 @@ Page({
       return;
     }
     wx.navigateTo({
-      url: `/pages/chat/chat?id=${this.data.serviceId}`
+      url: `/pages/chat/chat?serviceId=${this.data.serviceId}&serviceName=${encodeURIComponent(this.data.service.title)}`
     });
   }
 });

@@ -1,0 +1,9 @@
+{
+  "name": "getChats",
+  "version": "1.0.0",
+  "description": "获取聊天列表（用于消息页面）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

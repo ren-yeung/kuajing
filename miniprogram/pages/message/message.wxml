@@ -42,8 +42,13 @@
     wx:key="id"
     bindtap="goChat"
     data-id="{{item.id}}"
+    data-serviceid="{{item.serviceId}}"
+    data-servicetitle="{{item.serviceTitle}}"
   >
-    <view class="message-avatar" style="background: {{item.avatarBg}};">
+    <view wx:if="{{item.avatar}}" class="message-avatar message-avatar-img">
+      <image src="{{item.avatar}}" mode="aspectFill"></image>
+    </view>
+    <view wx:else class="message-avatar" style="background: {{item.avatarBg}};">
       <text>{{item.avatarText}}</text>
     </view>
     <view class="message-content">

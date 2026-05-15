@@ -45,8 +45,8 @@ exports.main = async (event, context) => {
         const merchantResult = await db.collection('users').doc(service.userId).get();
         const merchant = merchantResult.data;
         
-        // 获取头像（优先用 users 集合的）
-        let avatar = service.merchantAvatar || merchant.avatar || '';
+        // 获取商家头像（只使用 merchantAvatar，完全隔离用户头像）
+        let avatar = service.merchantAvatar || '';
         
         // 如果是云存储 fileID，转换为临时链接
         if (avatar && avatar.startsWith('cloud://')) {
@@ -148,7 +148,7 @@ exports.main = async (event, context) => {
           priceUnit: service.priceUnit || '元',
           images: service.images || [],
           provider: service.merchantName || '匿名商家',
-          avatar: service.merchantAvatar || '',
+          avatar: service.merchantAvatar || '', // 只使用商家头像
           avatarText: (service.merchantName || '匿名').charAt(0),
           avatarBg: '#E6F1FB',
           avatarColor: '#185FA5',

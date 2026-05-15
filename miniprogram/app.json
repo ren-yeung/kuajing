@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/message/message",
+    "pages/chat/chat",
     "pages/profile/profile",
     "pages/admin-home/admin-home",
     "pages/publish-need/publish-need",

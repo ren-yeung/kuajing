@@ -564,8 +564,12 @@ Page({
       return;
     }
     const serviceId = e.currentTarget.dataset.id;
+    // 从服务列表中找到对应的服务
+    const service = this.data.services.find(s => s.id === serviceId) || 
+                    this.data.merchantServices.find(s => s.id === serviceId);
+    const serviceName = service ? encodeURIComponent(service.title) : '';
     wx.navigateTo({
-      url: `/pages/chat/chat?serviceId=${serviceId}`
+      url: `/pages/chat/chat?serviceId=${serviceId}&serviceName=${serviceName}`
     });
   },
 

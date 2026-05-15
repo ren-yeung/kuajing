@@ -92,8 +92,8 @@ Page({
           ];
           const avatarBg = avatarBgs[user._id.charCodeAt(0) % avatarBgs.length];
           
-          // 优先使用商家头像，否则使用用户头像
-          const avatarUrl = user.merchantAvatar || user.avatar || '';
+          // 只使用商家头像，完全隔离用户头像
+          const avatarUrl = user.merchantAvatar || '';
 
           this.setData({
             merchantInfo: {
